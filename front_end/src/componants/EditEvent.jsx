@@ -1,258 +1,175 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import OrganisateurSideBar from './OrganisateurSideBar';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const EditEvent = () => {
-  const { id } = useParams(); 
+  const { id } = useParams(); // Get event ID from route
   const navigate = useNavigate();
-
-  const [formData, setFormData] = useState({
+  const [eventData, setEventData] = useState({
     title: '',
     description: '',
     date_debut: '',
     date_fin: '',
     lieu: '',
     prix: '',
-    categorie: 'billetterie',
+    categorie: '',
     image: null,
   });
-  const [editingEvent, setEditingEvent] = useState(null);
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [preview, setPreview] = useState(null);
+  const [message, setMessage] = useState('');
+  const [errors, setErrors] = useState({});
 
-  // Charger les infos de l’événement existant
+  // Fetch event data on mount
   useEffect(() => {
-    const fetchEvent = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`http://127.0.0.1:8000/api/evenement/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+    axios.get(`http://localhost:8000/api/evenement/${id}`)
+      .then(res => {
+        const data = res.data.evenement;
+        setEventData({
+          title: data.title,
+          description: data.description,
+          date_debut: data.date_debut.slice(0, 16),
+          date_fin: data.date_fin.slice(0, 16),
+          lieu: data.lieu,
+          prix: data.prix,
+          categorie: data.categorie,
+          image: null,
         });
-
-        const event = response.data.evenement || response.data; // selon ta réponse API
-        setEditingEvent(event);
-
-        setFormData({
-          title: event.title,
-          description: event.description || '',
-          date_debut: event.date_debut.slice(0, 16), 
-          date_fin: event.date_fin.slice(0, 16),
-          lieu: event.lieu,
-          prix: event.prix,
-          categorie: event.categorie,
-          image: null, // l'image ne sera re-uploadée que si modifiée
-        });
-      } catch (err) {
-        console.error("Erreur lors du chargement de l'événement :", err);
-        setError("Impossible de charger l'événement.");
-      }
-    };
-
-    fetchEvent();
+        setPreview(`http://localhost:8000/storage/${data.image}`);
+      })
+      .catch(err => console.log(err));
   }, [id]);
 
-  // Gestion des inputs
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleFileChange = (e) => {
-    setFormData(prev => ({ ...prev, image: e.target.files[0] }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    setSuccess('');
-
-    try {
-      const token = localStorage.getItem('token');
-      const formDataToSend = new FormData();
-      Object.keys(formData).forEach((key) => {
-        if (formData[key] !== null) {
-          formDataToSend.append(key, formData[key]);
-        }
-      });
-
-      const response = await axios.put(
-        `http://127.0.0.1:8000/api/evenement/${id}`,
-        formDataToSend,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
-
-      if (response.data.success) {
-        setSuccess("Événement mis à jour avec succès !");
-        setTimeout(() => {
-          navigate('/organisateur/events'); // redirige vers liste
-        }, 1500);
-      }
-    } catch (err) {
-      console.error("Erreur update :", err);
-      setError(err.response?.data?.message || "Erreur lors de la mise à jour.");
-    } finally {
-      setLoading(false);
+  const handleChange = e => {
+    const { name, value, files } = e.target;
+    if (name === 'image') {
+      setEventData(prev => ({ ...prev, image: files[0] }));
+      setPreview(URL.createObjectURL(files[0]));
+    } else {
+      setEventData(prev => ({ ...prev, [name]: value }));
     }
   };
 
-  const categories = [
-    { value: 'billetterie', label: 'Billetterie' },
-    { value: 'sport', label: 'Sport' },
-    { value: 'cinema', label: 'Cinéma' },
-  ];
+  const handleSubmit = async e => {
+    e.preventDefault();
+    const formData = new FormData();
+    Object.entries(eventData).forEach(([key, value]) => {
+      if (value !== null && value !== '') formData.append(key, value);
+    });
+
+    try {
+      const res = await axios.put(`http://localhost:8000/api/evenement/${id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setMessage(res.data.message);
+      setErrors({});
+      console.log(res.data);
+      // Optionally redirect after update
+      // navigate('/events');
+    } catch (err) {
+      if (err.response && err.response.data.errors) {
+        setErrors(err.response.data.errors);
+      } else {
+        console.error(err.response ? err.response.data : err);
+      }
+    }
+  };
 
   return (
-    <>
-      <OrganisateurSideBar />
-      <div className="create-event-container">
-        <div className="create-event-card">
-          <h1 style={{color:"white"}}>Modifier l'Événement</h1>
-          {error && <div className="error-message">{error}</div>}
-          {success && <div className="success-message">{success}</div>}
-
-          <form onSubmit={handleSubmit} className="event-form">
-            <div className="form-grid">
-              <div className="form-group full-width">
-                <label htmlFor="title">Titre *</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-
-              <div className="form-group full-width">
-                <label htmlFor="description">Description</label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  rows="4"
-                  style={{color:"white"}}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Date début de vente *</label>
-                <input
-                  type="datetime-local"
-                  name="date_debut"
-                  value={formData.date_debut}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Date d'événement *</label>
-                <input
-                  type="datetime-local"
-                  name="date_fin"
-                  value={formData.date_fin}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Lieu *</label>
-                <input
-                  type="text"
-                  name="lieu"
-                  value={formData.lieu}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Prix *</label>
-                <input
-                  type="number"
-                  name="prix"
-                  value={formData.prix}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Catégorie *</label>
-                <select
-                  name="categorie"
-                  value={formData.categorie}
-                  onChange={handleInputChange}
-                  required
-                  style={{color:"white"}}
-                >
-                  {categories.map(cat => (
-                    <option key={cat.value} value={cat.value}>{cat.label}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* SECTION IMAGE */}
-              <div className="form-group full-width">
-                <label htmlFor="image">Image de l'événement</label>
-
-                {/* Affiche l’image actuelle si aucune nouvelle n’est sélectionnée */}
-                {!formData.image && editingEvent && editingEvent.image && (
-                  <div style={{ marginBottom: "10px" }}>
-                    <p>Image actuelle :</p>
-                    <img
-                      src={`http://127.0.0.1:8000/storage/${editingEvent.image}`}
-                      alt="Event"
-                      style={{ width: "200px", borderRadius: "8px" }}
-                    />
-                  </div>
-                )}
-
-                {/* Preview nouvelle image */}
-                {formData.image && (
-                  <div style={{ marginBottom: "10px" }}>
-                    <p>Nouvelle image sélectionnée :</p>
-                    <img
-                      src={URL.createObjectURL(formData.image)}
-                      alt="Preview"
-                      style={{ width: "200px", borderRadius: "8px" }}
-                    />
-                  </div>
-                )}
-
-                <input
-                  type="file"
-                  id="image"
-                  name="image"
-                  onChange={handleFileChange}
-                  className="form-file"
-                  accept="image/*"
-                />
-                <small>Formats acceptés: JPG, PNG, WebP. Taille max: 5MB</small>
-              </div>
-            </div>
-
-            <div className="form-actions">
-              <button type="submit" className="submit-btn" disabled={loading}>
-                {loading ? "Mise à jour..." : "Mettre à jour"}
-              </button>
-            </div>
-          </form>
+    <div style={{ maxWidth: '600px', margin: 'auto', padding: '20px' }}>
+      <h2>Edit Event</h2>
+      {message && <p style={{ color: 'green' }}>{message}</p>}
+      <form onSubmit={handleSubmit} encType="multipart/form-data">
+        <div>
+          <label>Title:</label>
+          <input
+            type="text"
+            name="title"
+            value={eventData.title}
+            onChange={handleChange}
+          />
+          {errors.title && <span style={{ color: 'red' }}>{errors.title[0]}</span>}
         </div>
-      </div>
-    </>
+
+        <div>
+          <label>Description:</label>
+          <textarea
+            name="description"
+            value={eventData.description}
+            onChange={handleChange}
+          ></textarea>
+          {errors.description && <span style={{ color: 'red' }}>{errors.description[0]}</span>}
+        </div>
+
+        <div>
+          <label>Date Start:</label>
+          <input
+            type="datetime-local"
+            name="date_debut"
+            value={eventData.date_debut}
+            onChange={handleChange}
+          />
+          {errors.date_debut && <span style={{ color: 'red' }}>{errors.date_debut[0]}</span>}
+        </div>
+
+        <div>
+          <label>Date End:</label>
+          <input
+            type="datetime-local"
+            name="date_fin"
+            value={eventData.date_fin}
+            onChange={handleChange}
+          />
+          {errors.date_fin && <span style={{ color: 'red' }}>{errors.date_fin[0]}</span>}
+        </div>
+
+        <div>
+          <label>Lieu:</label>
+          <input
+            type="text"
+            name="lieu"
+            value={eventData.lieu}
+            onChange={handleChange}
+          />
+          {errors.lieu && <span style={{ color: 'red' }}>{errors.lieu[0]}</span>}
+        </div>
+
+        <div>
+          <label>Prix:</label>
+          <input
+            type="number"
+            name="prix"
+            value={eventData.prix}
+            onChange={handleChange}
+          />
+          {errors.prix && <span style={{ color: 'red' }}>{errors.prix[0]}</span>}
+        </div>
+
+        <div>
+          <label>Categorie:</label>
+          <select
+            name="categorie"
+            value={eventData.categorie}
+            onChange={handleChange}
+          >
+            <option value="">Select Category</option>
+            <option value="billetterie">Billetterie</option>
+            <option value="sport">Sport</option>
+            <option value="cinema">Cinema</option>
+          </select>
+          {errors.categorie && <span style={{ color: 'red' }}>{errors.categorie[0]}</span>}
+        </div>
+
+        <div>
+          <label>Image:</label>
+          <input type="file" name="image" onChange={handleChange} />
+          {preview && <img src={preview} alt="Preview" style={{ width: '200px', marginTop: '10px' }} />}
+          {errors.image && <span style={{ color: 'red' }}>{errors.image[0]}</span>}
+        </div>
+
+        <button type="submit" style={{ marginTop: '20px' }}>Update Event</button>
+      </form>
+    </div>
   );
 };
 

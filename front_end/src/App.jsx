@@ -13,6 +13,7 @@ import CreateEvent from './componants/CreateEvent'
 import ShowEvents from './componants/ShowEvents'
 import EventDetail from './componants/EventDetail'
 import EditEvent from './componants/EditEvent'
+import ShowUserEventDetail from './componants/ShowUserEventDetail'
 
 
 
@@ -33,6 +34,7 @@ const App = () => {
         <Route path='/organisateur/create-event' element={<CreateEvent />} />
         <Route path='organisateur/events' element={<ShowEvents />} />
          <Route path="/event/:id" element={<EventDetail />} />
+         <Route path="/user/event/:id" element={<ShowUserEventDetail />} />
          <Route path="/organisateur/edit-event/:id" element={<EditEvent />} />
 
 

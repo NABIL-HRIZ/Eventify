@@ -98,13 +98,16 @@ public function getOwnEvents()
         return response()->json($evenement);
     }
 
-    //  Modifier un événement
-   public function update(Request $request, $id)
+
+
+    public function update(Request $request, $id)
 {
+    $evenement = Evenement::findOrFail($id);
+
     $request->validate([
         'image'       => ['nullable', 'file', 'image', 'max:2048'],
         'title'       => 'sometimes|string|max:255',
-        'description' => 'sometimes|string',
+        'description' => 'nullable|string',
         'date_debut'  => 'sometimes|date',
         'date_fin'    => 'sometimes|date|after_or_equal:date_debut',
         'lieu'        => 'sometimes|string|max:255',
@@ -112,33 +115,27 @@ public function getOwnEvents()
         'categorie'   => 'sometimes|in:billetterie,sport,cinema',
     ]);
 
-    $evenement = Evenement::findOrFail($id);
-
-    // Gérer l'image si uploadée
     if ($request->hasFile('image')) {
         $path = $request->file('image')->store('evenements', 'public');
         $evenement->image = $path;
     }
 
-    // Mettre à jour les autres champs si présents
-    $evenement->fill($request->only([
-        'title',
-        'description',
-        'date_debut',
-        'date_fin',
-        'lieu',
-        'prix',
-        'categorie'
-    ]));
+    $fields = ['title', 'description', 'date_debut', 'date_fin', 'lieu', 'prix', 'categorie'];
+    foreach ($fields as $field) {
+        if ($request->filled($field)) {
+            $evenement->$field = $request->$field;
+        }
+    }
 
     $evenement->save();
 
     return response()->json([
-        'success'   => true,
-        'message'   =>"update successfuly",
+        'success' => true,
+        'message' => 'Événement mis à jour avec succès',
         'evenement' => $evenement,
-    ], 200);
+    ]);
 }
+
 
 
     // Supprimer un événement

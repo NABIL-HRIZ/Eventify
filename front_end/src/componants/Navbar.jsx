@@ -79,6 +79,7 @@ useEffect(() => {
                   </NavDropdown.Item>
                   <NavDropdown.Divider />
                   <NavDropdown.Item as={Link} to="/organisateur/profile" className='mes-links'>Mes informations</NavDropdown.Item>
+                  <NavDropdown.Item as={Link} to="/organisateur/create-event" className='mes-links'>Ajouter un événement</NavDropdown.Item>
                   <NavDropdown.Item as={Link} to="/organisateur/events" className='mes-links'>Mes Evénements</NavDropdown.Item>
                   <NavDropdown.Divider />
                   <NavDropdown.Item onClick={handleLogout} style={{padding:"15px",background:"red",width:"90%",marginLeft:"10px",textAlign:"center",color:"white"}}>Se déconnecter</NavDropdown.Item>
