@@ -11,20 +11,15 @@ class UserController extends Controller
     
 public function UserConnected(Request $request)
 {
-    $user = Auth::user();
-
-    if ($user) {
-        return response()->json([
-            'success' => true,
-            'user' => $user
-        ]);
-    }
+    $user = $request->user();
 
     return response()->json([
-        'success' => false,
-        'message' => 'No user authenticated'
-    ], 401);
+        'success' => true,
+        'user' => $user,
+        'roles' => $user->roles->pluck('name') 
+    ]);
 }
+
 
 public function update(Request $request)
 {

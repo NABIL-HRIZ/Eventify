@@ -13,7 +13,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import '../styles/OrganisateurSideBar.css';
 
-const OrganisateurSideBar = () => {
+const AdminSideBar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
@@ -38,10 +38,12 @@ const OrganisateurSideBar = () => {
   }, []);
 
 const menuItems = [
-  { icon: <FaTachometerAlt />, label: 'Dashboard Accueil', path: '/organisateur' },
-  { icon: <FaUser />, label: 'Mes Informations', path: '/organisateur/profile' },
-  { icon: <FaPlus />, label: 'Créer Événement', path: '/organisateur/create-event' },
-  { icon: <FaCalendarAlt />, label: 'Mes Événements', path: '/organisateur/events' },
+  { icon: <FaTachometerAlt />, label: 'Dashboard Accueil', path: '/admin' },
+  { icon: <FaUser />, label: 'Mes Informations', path: '/admin/profile' },
+  { icon: <FaPlus />, label: 'Créer Utilisateur', path: '/admin/create-user' },
+  { icon: <FaUser />, label: 'Toutes Utilisateurs', path: '/admin/users' },
+  { icon: <FaPlus />, label: 'Créer Événement', path: '/admin/create-event' },
+  { icon: <FaCalendarAlt />, label: 'Toutes Événements', path: '/admin/events' },
   { icon: <FaSignOutAlt />, label: 'Se Déconnecter', path: '/logout' }
 ];
 
@@ -64,21 +66,17 @@ const menuItems = [
     }
   };
 
-  const handleDeleteAccount = () => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer votre compte ?')) {
-      console.log('Deleting account...');
+
+
+  const handleNavigation = (path) => {
+    if (path === '/logout') {
+      handleLogout();
+    } else if (path === '/organisateur/delete-account') {
+      handleDeleteAccount();
+    } else {
+      navigate(path);
     }
   };
-
-const handleNavigation = (path) => {
-  if (path === '/logout') {
-    handleLogout();
-  } else {
-    navigate(path); 
-};
-
-}
-
 
   return (
     <div className={`organisateur-sidebar ${isCollapsed ? 'collapsed' : ''}`}>
@@ -113,4 +111,4 @@ const handleNavigation = (path) => {
   );
 };
 
-export default OrganisateurSideBar;
+export default AdminSideBar;

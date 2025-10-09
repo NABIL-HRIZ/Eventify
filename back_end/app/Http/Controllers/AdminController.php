@@ -9,11 +9,23 @@ use App\Models\Role;
 class AdminController extends Controller
 {
     //  Get all users
-    public function getAllUsers()
-    {
-        $users = User::all(); 
-        return response()->json($users, 200);
-    }
+  public function getAllUsers()
+{
+    $users = User::with('roles')->get();
+
+    $userss = $users->map(function ($user) {
+        return [
+            'id' => $user->id,
+            'prenom' => $user->prenom,
+            'nom' => $user->nom,
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'role' => $user->roles->pluck('name')->join(', ') 
+        ];
+    });
+
+    return response()->json($userss, 200);
+}
 
     //  Create a new user
     public function storeUser(Request $request)

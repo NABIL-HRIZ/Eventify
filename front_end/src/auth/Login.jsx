@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import '../styles/Login.css';
-
+import { useContext } from 'react';
+import { AuthContext } from './AuthContext';
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { setUser } = useContext(AuthContext);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -41,6 +43,10 @@ const Login = () => {
 
       localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem("token", token);
+      setUser({
+  ...userData,
+  role: roles[0] || null 
+});
       localStorage.setItem("roles", JSON.stringify(roles));
 
       if (roles.includes("admin")) {
@@ -63,7 +69,7 @@ const Login = () => {
     }
   };
 
-  // auto login check
+  
  useEffect(() => {
   const token = localStorage.getItem("token");
   if (!token) return;

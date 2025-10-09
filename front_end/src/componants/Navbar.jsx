@@ -1,51 +1,29 @@
-import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
-import appStore from '../assets/app-store.webp';
-import playStore from '../assets/play-store.jpg';
+import { Link, useNavigate } from "react-router-dom";
+import { useContext, useState } from "react";
+import axios from "axios";
+import { AuthContext } from "../auth/AuthContext";
 import { FaBars } from "react-icons/fa";
 import { IoCartOutline } from "react-icons/io5";
 import mar_flag from '../assets/mar.jpg';
-import { Link, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import appStore from '../assets/app-store.webp';
+import playStore from '../assets/play-store.jpg';
 import '../styles/Navbar.css';
 
 function MyNavbar() {
-  const [user, setUser] = useState(null);
+  const { user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
-
-
-
-useEffect(() => {
-  const fetchUser = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-    try {
-      const res = await axios.get("http://127.0.0.1:8000/api/user", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setUser(res.data.user);
-    } catch {
-      setUser(null);
-    }
-  };
-
-  fetchUser();
-}, [localStorage.getItem("token")]); 
-
-
-
-
-
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
     try {
-      await axios.post("http://127.0.0.1:8000/api/logout", {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.post(
+        "http://127.0.0.1:8000/api/logout",
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       localStorage.removeItem("token");
       setUser(null);
       navigate("/login");
@@ -54,70 +32,182 @@ useEffect(() => {
     }
   };
 
-  return (
-    <Navbar expand="lg" className="" style={{ marginTop:"20px" }}>
-      <Container>
-        <Navbar.Brand href="/">Eventify</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-1" style={{ marginLeft:"500px" }}>
-            <Nav.Link href="#link">Qui Sommes Nous ?</Nav.Link>
-            <Nav.Link href="#">FAQ</Nav.Link>
-            <Nav.Link href="#"><img src={mar_flag} style={{ width:"20px" }} alt="Maroc flag"/></Nav.Link>
-            <Nav.Link href="#"><IoCartOutline style={{ fontSize:"25px" }}/></Nav.Link>
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
 
-            <NavDropdown 
-              title={<FaBars style={{ fontSize:"25px" }}/>} 
-              id="basic-nav-dropdown"
-              align="end"
-            >
-              {user ? (
-                <>
-                  <NavDropdown.Item disabled>
-                    <strong style={{background:"white",color:"black"}}>{user.prenom} {user.nom}</strong><br/>
-                    <small  style={{background:"white",color:"black"}}>{user.email}</small>
-                  </NavDropdown.Item>
-                  <NavDropdown.Divider />
-                  <NavDropdown.Item as={Link} to="/organisateur/profile" className='mes-links'>Mes informations</NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to="/organisateur/create-event" className='mes-links'>Ajouter un événement</NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to="/organisateur/events" className='mes-links'>Mes Evénements</NavDropdown.Item>
-                  <NavDropdown.Divider />
-                  <NavDropdown.Item onClick={handleLogout} style={{padding:"15px",background:"red",width:"90%",marginLeft:"10px",textAlign:"center",color:"white"}}>Se déconnecter</NavDropdown.Item>
-                  <NavDropdown.Divider />
-                  <NavDropdown.Divider />
-                  <NavDropdown.Item className='dropdown-footer'>
-                    <h5 style={{ backgroundColor:'white', marginBottom:"20px" }}>
-                      Télécharger L'application
-                    </h5>
-                    <div className='imgs'>
-                      <img src={appStore} alt="App Store" />
-                      <img src={playStore} alt="Play Store" />
+  const closeDropdown = () => {
+    setIsDropdownOpen(false);
+  };
+
+  return (
+    <nav className="modern-navbar">
+      <div className="nav-container">
+        <Link className="navbar-brand-modern" to="/">
+          <span className="brand-text">Eventify</span>
+        </Link>
+
+        <div className="nav-center">
+          <Link className="nav-link-modern" to="/about" onClick={closeDropdown}>
+            Qui Sommes Nous ?
+          </Link>
+          <Link className="nav-link-modern" to="/faq" onClick={closeDropdown}>
+            FAQ
+          </Link>
+          <span className="nav-link-modern flag-link">
+            <img src={mar_flag} alt="Maroc flag" className="flag-img"/>
+          </span>
+          <Link className="nav-link-modern cart-link" to="/cart" onClick={closeDropdown}>
+            <IoCartOutline className="cart-icon"/>
+            <span className="cart-badge">0</span>
+          </Link>
+        </div>
+
+        <div className="nav-right">
+          <div className={`dropdown-container ${isDropdownOpen ? 'active' : ''}`}>
+            <button className="dropdown-toggle" onClick={toggleDropdown}>
+              <div className="dropdown-toggle-content">
+                <FaBars className="dropdown-icon"/>
+                {user && (
+                  <span className="user-avatar">
+                    {user.prenom?.charAt(0)}{user.nom?.charAt(0)}
+                  </span>
+                )}
+              </div>
+            </button>
+
+            {isDropdownOpen && (
+              <div className="dropdown-menu show">
+                {user ? (
+                  <>
+                    <div className="dropdown-user-info">
+                      <div className="user-avatar-large">
+                        {user.prenom?.charAt(0)}{user.nom?.charAt(0)}
+                      </div>
+                      <div className="user-details">
+                        <div className="user-name">{user.prenom} {user.nom}</div>
+                        <div className="user-email">{user.email}</div>
+                        <div className="user-role-badge">{user.role}</div>
+                      </div>
                     </div>
-                  </NavDropdown.Item>
-                </>
-              ) : (
-                <>
-                  <NavDropdown.Item as={Link} to="/login">Se connecter</NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to="/register">Inscription</NavDropdown.Item>
-                  <NavDropdown.Divider />
-                  <NavDropdown.Item>Politique de remboursement</NavDropdown.Item>
-                  <NavDropdown.Divider />
-                  <NavDropdown.Item className='dropdown-footer'>
-                    <h5 style={{ backgroundColor:'white', marginBottom:"20px" }}>
-                      Télécharger L'application
-                    </h5>
-                    <div className='imgs'>
-                      <img src={appStore} alt="App Store" />
-                      <img src={playStore} alt="Play Store" />
+                    
+                    <div className="dropdown-divider"></div>
+
+                    {/* Dynamic role-based menu */}
+                    {user.role === "admin" && (
+                      <>
+                        <Link to="/admin" className="dropdown-item-modern" onClick={closeDropdown}>
+                          <div className="menu-item-icon"></div>
+                          Tableau de bord admin
+                        </Link>
+                        <Link to="/admin/users" className="dropdown-item-modern" onClick={closeDropdown}>
+                          <div className="menu-item-icon">👥</div>
+                          Gérer les utilisateurs
+                        </Link>
+                        <Link to="/admin/events" className="dropdown-item-modern" onClick={closeDropdown}>
+                          <div className="menu-item-icon"></div>
+                          Gérer les événements
+                        </Link>
+                      </>
+                    )}
+
+                    {user.role === "organisateur" && (
+                      <>
+                        <Link to="/organisateur/profile" className="dropdown-item-modern" onClick={closeDropdown}>
+                          <div className="menu-item-icon"></div>
+                          Mes informations
+                        </Link>
+                        <Link to="/organisateur/create-event" className="dropdown-item-modern" onClick={closeDropdown}>
+                          <div className="menu-item-icon"></div>
+                          Ajouter un événement
+                        </Link>
+                        <Link to="/organisateur/events" className="dropdown-item-modern" onClick={closeDropdown}>
+                          <div className="menu-item-icon"></div>
+                          Mes Événements
+                        </Link>
+                        
+                      </>
+                    )}
+
+                    {user.role === "user" && (
+                      <>
+                        <Link to="/user/profile" className="dropdown-item-modern" onClick={closeDropdown}>
+                          <div className="menu-item-icon">👤</div>
+                          Mon profil
+                        </Link>
+                        <Link to="/user/tickets" className="dropdown-item-modern" onClick={closeDropdown}>
+                          <div className="menu-item-icon"></div>
+                          Mes tickets
+                        </Link>
+                        <Link to="/user/favorites" className="dropdown-item-modern" onClick={closeDropdown}>
+                          <div className="menu-item-icon"></div>
+                          Mes favoris
+                        </Link>
+                        <Link to="/user/reservations" className="dropdown-item-modern" onClick={closeDropdown}>
+                          <div className="menu-item-icon"></div>
+                          Mes réservations
+                        </Link>
+                      </>
+                    )}
+
+                    <div className="dropdown-divider"></div>
+                    
+                    <button onClick={handleLogout} className="dropdown-item-logout">
+                      <div className="menu-item-icon"></div>
+                      Se déconnecter
+                    </button>
+
+                    <div className="dropdown-divider"></div>
+                    
+                    <div className="dropdown-footer">
+                      <h5 className="footer-title">Télécharger L'application</h5>
+                      <div className="app-download-buttons">
+                        <img src={appStore} alt="App Store" className="app-download-img" />
+                        <img src={playStore} alt="Play Store" className="app-download-img" />
+                      </div>
                     </div>
-                  </NavDropdown.Item>
-                </>
-              )}
-            </NavDropdown>
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" className="dropdown-item-modern" onClick={closeDropdown}>
+                      <div className="menu-item-icon">🔑</div>
+                      Se connecter
+                    </Link>
+                    <Link to="/register" className="dropdown-item-modern" onClick={closeDropdown}>
+                      <div className="menu-item-icon">📝</div>
+                      Inscription
+                    </Link>
+                    <div className="dropdown-divider"></div>
+                    <Link to="/refund-policy" className="dropdown-item-modern" onClick={closeDropdown}>
+                      <div className="menu-item-icon">📄</div>
+                      Politique de remboursement
+                    </Link>
+                    <div className="dropdown-divider"></div>
+                    <div className="dropdown-footer">
+                      <h5 className="footer-title">Télécharger L'application</h5>
+                      <div className="app-download-buttons">
+                        <img src={appStore} alt="App Store" className="app-download-img" />
+                        <img src={playStore} alt="Play Store" className="app-download-img" />
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile menu button */}
+        <button className="mobile-menu-btn" onClick={toggleDropdown}>
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+      {/* Mobile menu overlay */}
+      {isDropdownOpen && <div className="dropdown-overlay" onClick={closeDropdown}></div>}
+    </nav>
   );
 }
 

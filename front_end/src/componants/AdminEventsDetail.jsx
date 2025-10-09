@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import AdminSideBar from "./AdminSideBar";
+import '../styles/EventDetail.css';
 import { IoLocationOutline } from "react-icons/io5";
 import { MdDateRange } from "react-icons/md";
-import '../styles/ShowUserEventDetail.css'
+import { Link } from "react-router-dom";
 
-const ShowUserEventDetail = () => {
+const AdminEventsDetail = () => {
   const { id } = useParams(); 
   const navigate = useNavigate();
   const [event, setEvent] = useState(null);
@@ -27,6 +29,9 @@ const ShowUserEventDetail = () => {
     fetchEvent();
   }, [id]);
 
+  const handleEdit = () => {
+    navigate(`/admin/edit-event/${id}`);
+  };
 
   const handleBack = () => {
     navigate(-1);
@@ -48,7 +53,8 @@ const ShowUserEventDetail = () => {
   if (loading) {
     return (
       <>
-        <div className="user-event-detail-loading">
+        <AdminSideBar />
+        <div className="event-detail-loading">
           <div className="loading-spinner"></div>
           <p>Chargement des détails de l'événement...</p>
         </div>
@@ -59,7 +65,8 @@ const ShowUserEventDetail = () => {
   if (!event) {
     return (
       <>
-        <div className="user-event-detail-error">
+        <AdminSideBar />
+        <div className="event-detail-error">
           <div className="error-icon"></div>
           <h3>Événement non trouvé</h3>
           <p>L'événement que vous recherchez n'existe pas ou a été supprimé.</p>
@@ -73,18 +80,26 @@ const ShowUserEventDetail = () => {
 
   return (
     <>
-      <div className="user-event-detail-container">
-        <div className="user-event-detail-card">
-          <div className="user-event-detail-header-back">
-           <Link to='/'>Retourner</Link>
+      <AdminSideBar />
+      <div className="event-detail-container">
+        <div className="event-detail-card">
+          <div className="event-detail-header">
+             <div className="user-event-detail-header-back">
+           <Link to='/admin/events'>Retourner</Link>
+          </div>
+            <div className="header-actions">
+              <button onClick={handleEdit} className="edit-button">
+                 Modifier l'événement
+              </button>
+            </div>
           </div>
 
-          <div className="user-event-detail-content">
-            <div className="user-event-detail-info">
+          <div className="event-detail-content">
+            <div className="event-detail-info">
               
-              <h1>{event.organisateur.prenom} _ {event.organisateur.nom}</h1>
-              <h1 className="user-event-detail-title" style={{color:"white"}}>{event.title}</h1>
-              <p className="user-event-detail-description">{event.description}</p>
+
+              <h1 className="event-detail-title" style={{color:"white"}}>{event.title}</h1>
+              <p className="event-detail-description">{event.description}</p>
 
               <div className="detail-card">
                   
@@ -93,7 +108,7 @@ const ShowUserEventDetail = () => {
                   </div>
                 </div>
 
-              <div className="user-event-detail-details-grid">
+              <div className="event-detail-details-grid">
                 <div className="detail-card">
                   <div className="detail-icon"><MdDateRange /></div>
                   <div className="detail-content">
@@ -119,16 +134,14 @@ const ShowUserEventDetail = () => {
                 </div>
 
                  
-              <div style={{marginLeft:'40px',marginTop:"20px"}}>
-               <button className="edit-button" style={{color:"#000"}}>Achetez Maintenant</button>
-              </div>
+
                 
               </div>
 
              
             </div>
 
-            <div className="user-event-detail-visual">
+            <div className="event-detail-visual">
               <div className="image-container">
                 {event.image && !imageError ? (
                   <img 
@@ -144,8 +157,18 @@ const ShowUserEventDetail = () => {
                 )}
               </div>
 
-              
-              
+              {/* Quick Stats */}
+              <div className="quick-stats">
+                <div className="stat">
+                  <span className="stat-number">0</span>
+                  <span className="stat-label">Billets vendus</span>
+                </div>
+                <div className="stat">
+                  <span className="stat-number">{event.views}</span>
+                  <span className="stat-label">Vues</span>
+                </div>
+               
+              </div>
             </div>
           </div>
         </div>
@@ -154,4 +177,4 @@ const ShowUserEventDetail = () => {
   );
 };
 
-export default ShowUserEventDetail;
+export default AdminEventsDetail;

@@ -16,6 +16,8 @@ class EvenementController extends Controller
         return response()->json(Evenement::with('organisateur')->get());
     }
 
+
+
     // Liste des événements personnels d'un organisateur 
     
 
@@ -23,6 +25,7 @@ class EvenementController extends Controller
 public function getOwnEvents()
 {
     $user = Auth::user();
+
 
     if (!$user) {
         return response()->json([

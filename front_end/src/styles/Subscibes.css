@@ -1,0 +1,211 @@
+.contact-us-section {
+  padding: 80px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  position: relative;
+  overflow: hidden;
+}
+
+
+
+.contact-us-container {
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.contact-us-content {
+  background: rgba(10, 10, 10, 0.95);
+  padding: 60px 40px;
+  border-radius: 25px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: slideUp 0.8s ease-out;
+}
+
+
+
+.contact-us-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #e3e97a 0%, #545324 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.contact-us-description {
+  font-size: 1.2rem;
+  color: #bdbfbf;
+  line-height: 1.6;
+  margin-bottom: 40px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: transparent;
+}
+
+.newsletter-form {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.input-group {
+  display: flex;
+  gap: 15px;
+  background:#000;
+  border-radius: 15px;
+  padding: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e8eeff;
+  transition: all 0.3s ease;
+}
+
+.input-group:focus-within {
+  border-color: #eee18c;
+}
+
+.email-input {
+  flex: 1;
+  border: none;
+  padding: 20px 25px;
+  font-size: 1.1rem;
+  border-radius: 12px;
+  outline: none;
+  background: transparent;
+  color: #e5e6e8;
+}
+
+.email-input::placeholder {
+  color: #aab7c4;
+  font-size: 1rem;
+}
+
+.email-input:active{
+    background-color:#000 !important;
+
+}
+
+.subscribe-btn {
+  background:rgb(219, 219, 139);
+  color: rgb(7, 7, 7);
+  border: none;
+  padding: 20px 35px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+
+
+.subscribe-btn.success {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%) !important;
+
+}
+
+@media (max-width: 768px) {
+  .contact-us-section {
+    padding: 60px 15px;
+    min-height: 300px;
+  }
+  
+  .contact-us-content {
+    padding: 40px 25px;
+  }
+  
+  .contact-us-title {
+    font-size: 2rem;
+  }
+  
+  .contact-us-description {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+  }
+  
+  .input-group {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .email-input {
+    padding: 18px 20px;
+    font-size: 1rem;
+  }
+  
+  .subscribe-btn {
+    padding: 18px 25px;
+    font-size: 1rem;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .contact-us-section {
+    padding: 40px 10px;
+  }
+  
+  .contact-us-content {
+    padding: 30px 20px;
+    border-radius: 20px;
+  }
+  
+  .contact-us-title {
+    font-size: 1.8rem;
+  }
+  
+  .contact-us-description {
+    font-size: 1rem;
+  }
+  
+  .email-input {
+    padding: 15px 18px;
+  }
+  
+  .subscribe-btn {
+    padding: 15px 20px;
+  }
+}
+
+/* Loading animation for button */
+.subscribe-btn.loading {
+  position: relative;
+  color: transparent;
+}
+
+.subscribe-btn.loading::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+  margin: -10px 0 0 -10px;
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Focus states for accessibility */
+.email-input:focus {
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.subscribe-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+}

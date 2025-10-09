@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EvenementController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\SubscribeController;
 
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
@@ -30,7 +31,13 @@ Route::middleware(['auth:sanctum','role:admin'])->group(function() {
     Route::delete('/user/{id}', [AdminController::class,'deleteUser']);
     Route::get('/user-details/{id}', [AdminController::class,'getUserDetail']);
 
+    // subscribe controller
+
+    Route::get('/show-emails', [SubscribeController::class,'getEmails']);
+
+
 });
+    Route::post('/add-email', [SubscribeController::class,'store']);
 
 
 // evenement conroller

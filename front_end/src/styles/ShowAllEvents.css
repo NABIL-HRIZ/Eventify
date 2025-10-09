@@ -31,9 +31,9 @@
 
 
 .all-events-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1.5rem;
+  display: grid !important;
+  grid-template-columns: repeat(4,1fr) !important;
+  gap: 1rem !important;
 }
 
 .event-card {
