@@ -13,7 +13,6 @@ const UserHome = () => {
     <CarousselEvents />
     <ShowAllEvents />
     <About />
-    <Subscibes />
     </>
   )
 }

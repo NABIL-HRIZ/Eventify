@@ -21,6 +21,13 @@ import ShowUsers from './componants/ShowUsers'
 import ALLEvents from './componants/ALLEvents'
 import AdminEventsDetail from './componants/AdminEventsDetail'
 import AdminEditEvent from './componants/AdminEditEvent'
+import Footer from './componants/Footer'
+import Subscibes from './componants/Subscribes'
+import WhoUs from './componants/WhoUs'
+import Faqs from './componants/Faqs'
+import Politiques from './componants/Politiques'
+import Checkout from './componants/Checkout'
+import CheckoutForm from './componants/CheckoutForm.'
 
 
 
@@ -50,10 +57,19 @@ const App = () => {
          <Route path="/user/event/:id" element={<ShowUserEventDetail />} />
          <Route path="/organisateur/edit-event/:id" element={<EditEvent />} />
          <Route path="/admin/edit-event/:id" element={<AdminEditEvent />} />
+          <Route path='qui-sommes-nous' element={<WhoUs />} />
+          <Route path='faq' element={<Faqs />} />
+          <Route path='politique' element={<Politiques/>} />
+         <Route path="/user/event/:id/checkout" element={<Checkout />} />
+         <Route path="/create-payement" element={<Checkout />} />
+
 
 
 
       </Routes>
+    <Subscibes />
+
+      <Footer />
     </Router>
     </>
   )

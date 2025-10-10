@@ -42,9 +42,12 @@ const Subscibes = () => {
                 S'inscrire
               </button>
             </div>
+
+
+
           </form>
 
-          {message && <p className="message">{message}</p>} {/* show success/error message */}
+          {message && <p className="message">{message}</p>}
         </div>
       </div>
     </div>

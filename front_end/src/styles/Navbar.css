@@ -236,6 +236,11 @@
   font-size: 0.9rem;
 }
 
+.dropdown-item-modern:hover{
+  border-bottom: 2px solid rgb(225, 225, 105);
+  border-width: 80%;
+
+}
 
 
 .menu-item-icon {

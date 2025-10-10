@@ -12,6 +12,9 @@ const ShowUserEventDetail = () => {
   const [loading, setLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
 
+  const [isBuying, setIsBuying] = useState(false);
+  const [count, setCount] = useState(0);
+
   useEffect(() => {
     const fetchEvent = async () => {
       try {
@@ -26,7 +29,6 @@ const ShowUserEventDetail = () => {
 
     fetchEvent();
   }, [id]);
-
 
   const handleBack = () => {
     navigate(-1);
@@ -43,114 +45,147 @@ const ShowUserEventDetail = () => {
     });
   };
 
- 
+  const handleBuyNow = () => {
+    setIsBuying(true);
+  };
+
+
 
   if (loading) {
     return (
-      <>
-        <div className="user-event-detail-loading">
-          <div className="loading-spinner"></div>
-          <p>Chargement des détails de l'événement...</p>
-        </div>
-      </>
+      <div className="user-event-detail-loading">
+        <div className="loading-spinner"></div>
+        <p>Chargement des détails de l'événement...</p>
+      </div>
     );
   }
 
   if (!event) {
     return (
-      <>
-        <div className="user-event-detail-error">
-          <div className="error-icon"></div>
-          <h3>Événement non trouvé</h3>
-          <p>L'événement que vous recherchez n'existe pas ou a été supprimé.</p>
-          <button onClick={handleBack} className="back-btn">
-            Retour aux événements
-          </button>
-        </div>
-      </>
+      <div className="user-event-detail-error">
+        <div className="error-icon"></div>
+        <h3>Événement non trouvé</h3>
+        <p>L'événement que vous recherchez n'existe pas ou a été supprimé.</p>
+        <button onClick={handleBack} className="back-btn">
+          Retour aux événements
+        </button>
+      </div>
     );
   }
 
   return (
-    <>
-      <div className="user-event-detail-container">
-        <div className="user-event-detail-card">
-          <div className="user-event-detail-header-back">
-           <Link to='/'>Retourner</Link>
+    <div className="user-event-detail-container">
+      <div className="user-event-detail-card">
+        <div className="user-event-detail-header-back">
+          <Link to='/' className="back-link">
+            <span className="back-arrow">←</span>
+            Retourner aux événements
+          </Link>
+        </div>
+
+        <div className="user-event-detail-content">
+          <div className="user-event-detail-visual">
+            <div className="image-container">
+              {event.image && !imageError ? (
+                <img 
+                  src={`http://127.0.0.1:8000/storage/${event.image}`} 
+                  alt={event.title}
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                <div className="image-placeholder">
+                  <p>Image de l'événement</p>
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="user-event-detail-content">
-            <div className="user-event-detail-info">
-              
-              <h1>{event.organisateur.prenom} _ {event.organisateur.nom}</h1>
-              <h1 className="user-event-detail-title" style={{color:"white"}}>{event.title}</h1>
-              <p className="user-event-detail-description">{event.description}</p>
+          <div className="user-event-detail-info">
+            {!isBuying ? (
+              <>
+                <div className="event-organizer">
+                  <span className="organizer-badge">Organisé par</span>
+                  <h2 className="organizer-name">{event.organisateur.prenom} {event.organisateur.nom}</h2>
+                </div>
 
-              <div className="detail-card">
-                  
-                  <div className="detail-content">
-                    <p style={{fontSize:"24px",color:"#B6771D",border:"2px solid gray",padding:"10px",borderRadius:"15px"}}>{event.prix} MAD</p>
+                <h1 className="user-event-detail-title">{event.title}</h1>
+                <p className="user-event-detail-description">{event.description}</p>
+
+                <div className="price-card">
+                  <div className="price-content">
+                    <span className="price-label">Prix</span>
+                    <span className="price-amount">{event.prix} MAD</span>
                   </div>
                 </div>
 
-              <div className="user-event-detail-details-grid">
-                <div className="detail-card">
-                  <div className="detail-icon"><MdDateRange /></div>
-                  <div className="detail-content">
-                    <h4>Date de début des ventes</h4>
-                    <p>{formatDate(event.date_debut)}</p>
+                <div className="user-event-detail-details-grid">
+                  <div className="detail-card">
+                    <div className="detail-icon"><MdDateRange /></div>
+                    <div className="detail-content">
+                      <h4>Date de début des ventes</h4>
+                      <p>{formatDate(event.date_debut)}</p>
+                    </div>
+                  </div>
+
+                  <div className="detail-card">
+                    <div className="detail-icon"><MdDateRange /></div>
+                    <div className="detail-content">
+                      <h4>Date de l'événement</h4>
+                      <p>{formatDate(event.date_fin)}</p>
+                    </div>
+                  </div>
+
+                  <div className="detail-card">
+                    <div className="detail-icon"><IoLocationOutline /></div>
+                    <div className="detail-content">
+                      <h4>Lieu</h4>
+                      <p>{event.lieu}</p>
+                    </div>
                   </div>
                 </div>
 
-                <div className="detail-card">
-                  <div className="detail-icon"><MdDateRange /></div>
-                  <div className="detail-content">
-                    <h4>Date de l'événement</h4>
-                    <p>{formatDate(event.date_fin)}</p>
+                <div className="action-section">
+                  <button className="buy-now-button" onClick={handleBuyNow}>
+                    Achetez Maintenant
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="purchase-section">
+                <h2 style={{color:"white"}}>Sélectionnez vos billets</h2>
+                <div className="counter-price-row">
+                  <div className="counter">
+                    <button onClick={() => setCount(Math.max(0, count - 1))} style={{color:"white"}}>-</button>
+                    <span style={{color:"white"}}>{count}</span>
+                    <button onClick={() => setCount(count + 1)} style={{color:"white"}}>+</button>
+                  </div>
+                  <div className="price">
+                    <span style={{color:"white"}} >{event.prix} MAD</span>
                   </div>
                 </div>
 
-                <div className="detail-card">
-                  <div className="detail-icon"><IoLocationOutline /></div>
-                  <div className="detail-content">
-                    <h4>Lieu</h4>
-                    <p>{event.lieu}</p>
-                  </div>
+                <div className="total" style={{color:"white"}}>
+                  Total: <strong>{count * event.prix} MAD</strong>
                 </div>
-
                  
-              <div style={{marginLeft:'40px',marginTop:"20px"}}>
-               <button className="edit-button" style={{color:"#000"}}>Achetez Maintenant</button>
-              </div>
-                
-              </div>
 
-             
-            </div>
+                <button
+  className="continue-button" style={{color:"#fff"}}
+  onClick={() => 
+    navigate(`/user/event/${event.id}/checkout`, {
+      state: { count } 
+    })
+  }
+>
+  Continue
+</button>
 
-            <div className="user-event-detail-visual">
-              <div className="image-container">
-                {event.image && !imageError ? (
-                  <img 
-                    src={`http://127.0.0.1:8000/storage/${event.image}`} 
-                    alt={event.title}
-                    onError={() => setImageError(true)}
-                  />
-                ) : (
-                  <div className="image-placeholder">
-                    <span></span>
-                    <p>Image de l'événement</p>
-                  </div>
-                )}
               </div>
-
-              
-              
-            </div>
+            )}
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

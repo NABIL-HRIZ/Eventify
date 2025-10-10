@@ -48,7 +48,7 @@ function MyNavbar() {
         </Link>
 
         <div className="nav-center">
-          <Link className="nav-link-modern" to="/about" onClick={closeDropdown}>
+          <Link className="nav-link-modern" to="/qui-sommes-nous" onClick={closeDropdown}>
             Qui Sommes Nous ?
           </Link>
           <Link className="nav-link-modern" to="/faq" onClick={closeDropdown}>
@@ -93,15 +93,15 @@ function MyNavbar() {
                     
                     <div className="dropdown-divider"></div>
 
-                    {/* Dynamic role-based menu */}
+
                     {user.role === "admin" && (
                       <>
                         <Link to="/admin" className="dropdown-item-modern" onClick={closeDropdown}>
                           <div className="menu-item-icon"></div>
-                          Tableau de bord admin
+                          Tableau de bord 
                         </Link>
                         <Link to="/admin/users" className="dropdown-item-modern" onClick={closeDropdown}>
-                          <div className="menu-item-icon">👥</div>
+                          <div className="menu-item-icon"></div>
                           Gérer les utilisateurs
                         </Link>
                         <Link to="/admin/events" className="dropdown-item-modern" onClick={closeDropdown}>
@@ -170,16 +170,16 @@ function MyNavbar() {
                 ) : (
                   <>
                     <Link to="/login" className="dropdown-item-modern" onClick={closeDropdown}>
-                      <div className="menu-item-icon">🔑</div>
+                      <div className="menu-item-icon"></div>
                       Se connecter
                     </Link>
                     <Link to="/register" className="dropdown-item-modern" onClick={closeDropdown}>
-                      <div className="menu-item-icon">📝</div>
+                      <div className="menu-item-icon"></div>
                       Inscription
                     </Link>
                     <div className="dropdown-divider"></div>
-                    <Link to="/refund-policy" className="dropdown-item-modern" onClick={closeDropdown}>
-                      <div className="menu-item-icon">📄</div>
+                    <Link to="/politique" className="dropdown-item-modern" onClick={closeDropdown}>
+                      <div className="menu-item-icon"></div>
                       Politique de remboursement
                     </Link>
                     <div className="dropdown-divider"></div>
