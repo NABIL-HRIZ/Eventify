@@ -1,14 +1,27 @@
-// src/pages/Checkout.js
+// src/pages/Checkout.jsx
 import React, { useEffect, useState, useContext } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/Checkout.css";
 import { AuthContext } from "../auth/AuthContext";
-import { FaCreditCard, FaUser, FaPhone, FaEnvelope, FaCalendarAlt, FaMapMarkerAlt, FaTicketAlt } from "react-icons/fa";
-import cmi from '../assets/cmi.jpg'
-import StripeContainer from "./StripeContainer";
+import { FaEnvelope, FaPhone, FaCalendarAlt, FaMapMarkerAlt } from "react-icons/fa";
+import cmi from "../assets/cmi.jpg";
+import { loadStripe } from "@stripe/stripe-js";
+
+
+import { useDispatch, useSelector } from "react-redux";
+import { incrementCart } from "../slices/CartSlice";
+import { addPurchasedEvent } from "../slices/UserSlice";
+
+
+
+const stripePromise = loadStripe("pk_test_51OmxxCFMrNvJHi85lITE0lzZbtF2p4rtVQDOeXdBRIIIWa5SjTeX9TL7TLMZH6I6PyomHXIgxXwYSqt81GqSZiAF00yXRbVvzP"); 
 
 const Checkout = () => {
+  const dispatch = useDispatch();
+const cartCount = useSelector((state) => state.cart.cartCount);
+const purchasedEvents = useSelector((state) => state.user.purchasedEvents);
+
   const { id } = useParams();
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -19,7 +32,6 @@ const Checkout = () => {
   const [acceptTerms, setAcceptTerms] = useState(false);
 
   const count = state?.count || 0;
-
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
 
@@ -38,23 +50,46 @@ const Checkout = () => {
   }, [id]);
 
 
+const handleCheckout = async () => {
+  try {
+const res = await axios.post("http://127.0.0.1:8000/api/create-checkout-session", {
+  amount: event.prix,
+  count,
+  title: event.title,
+  eventId: event.id,
+  userId: user?.id,
+  metadata: { userId: user?.id, eventId: event.id, count, amount: event.prix },
+  return_url: `http://localhost:3000/success`
+});
 
-  if (loading) return (
-    <div className="checkout-loading">
-      <div className="loading-spinner"></div>
-      <p>Chargement de votre commande...</p>
-    </div>
-  );
-  
-  if (!event) return (
-    <div className="checkout-error">
-      <h2>Événement non trouvé</h2>
-      <p>L'événement que vous recherchez n'existe pas ou a été supprimé.</p>
-      <button onClick={() => navigate("/")} className="back-home-btn">
-        Retour à l'accueil
-      </button>
-    </div>
-  );
+
+
+
+    window.location.href = res.data.url;
+  } catch (err) {
+    console.error("Erreur Stripe:", err);
+  }
+};
+
+
+  if (loading)
+    return (
+      <div className="checkout-loading">
+        <div className="loading-spinner"></div>
+        <p>Chargement de votre commande...</p>
+      </div>
+    );
+
+  if (!event)
+    return (
+      <div className="checkout-error">
+        <h2>Événement non trouvé</h2>
+        <p>L'événement que vous recherchez n'existe pas ou a été supprimé.</p>
+        <button onClick={() => navigate("/")} className="back-home-btn">
+          Retour à l'accueil
+        </button>
+      </div>
+    );
 
   return (
     <div className="modern-checkout-container">
@@ -66,11 +101,8 @@ const Checkout = () => {
       <div className="checkout-content">
         <div className="checkout-left">
           <div className="order-summary-card">
-            <h2 className="section-title">
-              
-              Récapitulatif de la commande
-            </h2>
-            
+            <h2 className="section-title">Récapitulatif de la commande</h2>
+
             <div className="event-image-container">
               {event.image && (
                 <img
@@ -83,26 +115,26 @@ const Checkout = () => {
 
             <div className="event-details">
               <h3 className="event-title">{event.title}</h3>
-              
+
               <div className="detail-item">
                 <FaCalendarAlt className="detail-icon" />
                 <div className="detail-content">
                   <span className="detail-label">Date de l'événement</span>
                   <span className="detail-value">
                     {new Date(event.date_fin).toLocaleString("fr-FR", {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
                     })}
                   </span>
                 </div>
               </div>
 
               <div className="detail-item">
-                <FaMapMarkerAlt className="detail-icon"/>
+                <FaMapMarkerAlt className="detail-icon" />
                 <div className="detail-content">
                   <span className="detail-label">Lieu</span>
                   <span className="detail-value">{event.lieu}</span>
@@ -111,7 +143,9 @@ const Checkout = () => {
 
               <div className="pricing-breakdown">
                 <div className="price-row">
-                  <span>{event.prix} MAD × {count} billet{count > 1 ? 's' : ''}</span>
+                  <span>
+                    {event.prix} MAD × {count} billet{count > 1 ? "s" : ""}
+                  </span>
                   <span>{count * event.prix} MAD</span>
                 </div>
                 <div className="price-row total">
@@ -125,22 +159,14 @@ const Checkout = () => {
 
         <div className="checkout-right">
           <div className="payment-card">
-            <h2 className="section-title">
-              
-              Informations de paiement
-            </h2>
+            <h2 className="section-title">Informations de paiement</h2>
 
             {!user && (
               <div className="guest-form">
-                <h3 className="form-subtitle">
-                 
-                  Informations personnelles
-                </h3>
-                
+                <h3 className="form-subtitle">Informations personnelles</h3>
+
                 <div className="input-group">
-                  <div className="input-icon">
-                    <FaEnvelope />
-                  </div>
+                  <div className="input-icon"><FaEnvelope /></div>
                   <input
                     type="email"
                     placeholder="Votre adresse email"
@@ -151,9 +177,7 @@ const Checkout = () => {
                 </div>
 
                 <div className="input-group">
-                  <div className="input-icon">
-                    <FaPhone />
-                  </div>
+                  <div className="input-icon"><FaPhone /></div>
                   <input
                     type="tel"
                     placeholder="Votre numéro de téléphone"
@@ -167,53 +191,44 @@ const Checkout = () => {
 
             <div className="payment-method">
               <h3 className="form-subtitle">Méthode de paiement</h3>
-              
               <div className="payment-options">
                 <label className="payment-option selected">
                   <input type="radio" name="payment" defaultChecked />
                   <div className="option-content">
-                    <img src={cmi} style={{width:'40px'}}/>
+                    <img src={cmi} style={{ width: "40px" }} alt="cmi" />
                     <div className="option-text">
                       <span className="option-title">Carte bancaire</span>
-                      <span className="option-desc">Paiement sécurisé</span>
+                      <span className="option-desc">Paiement sécurisé via Stripe</span>
                     </div>
                   </div>
                 </label>
-
-               
               </div>
             </div>
 
             <div className="terms-section">
               <label className="terms-checkbox">
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   checked={acceptTerms}
                   onChange={(e) => setAcceptTerms(e.target.checked)}
                 />
                 <span className="checkmark"></span>
-                <span className="terms-text" style={{color:'#fff'}}>
+                <span className="terms-text" style={{ color: "#fff" }}>
                   J'accepte les{" "}
-                  <a href="/politiques" target="_blank" rel="noreferrer" className="terms-link">
+                  <a href="/politique" target="_blank" rel="noreferrer" className="terms-link">
                     politiques de remboursement
-                  </a>{" "}
-                 
+                  </a>
                 </span>
               </label>
             </div>
 
-            <button 
-              className={`checkout-button ${!acceptTerms ? 'disabled' : ''}`}
-             onClick={() => 
-    navigate(`/create-payement`)
-  }
+            <button
+              onClick={handleCheckout}
+              className={`checkout-button ${!acceptTerms ? "disabled" : ""}`}
               disabled={!acceptTerms}
             >
-                <StripeContainer amount={2000} />
-              Payer {count * event.prix} MAD
+              Payer avec Stripe
             </button>
-
-           
           </div>
         </div>
       </div>

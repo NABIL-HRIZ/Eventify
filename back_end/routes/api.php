@@ -8,7 +8,10 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EvenementController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SubscribeController;
-
+use Stripe\Stripe;
+use Stripe\PaymentIntent;
+use Stripe\Checkout\Session;
+use App\Http\Controllers\TicketController;
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
@@ -60,8 +63,50 @@ Route::middleware(['auth:sanctum','role:admin|organisateur'])->group(function() 
     Route::delete('/evenement/{id}', [EvenementControllerr::class,'destroy']);
     Route::get('/evenement-personnels', [EvenementController::class,'getOwnEvents']);
     
-    
 });
+
+
+
+// stripe 
+
+
+
+Route::post('/create-checkout-session', function (Request $request) {
+    Stripe::setApiKey(env('STRIPE_SECRET'));
+
+    $session = Session::create([
+        'payment_method_types' => ['card'],
+        'line_items' => [[
+            'price_data' => [
+                'currency' => 'mad',
+                'unit_amount' => $request->amount * 100, 
+                'product_data' => [
+                    'name' => $request->title,
+                ],
+            ],
+            'quantity' => $request->count,
+        ]],
+        'mode' => 'payment',
+        'success_url' => 'http://localhost:5173/success?session_id={CHECKOUT_SESSION_ID}',
+        'cancel_url' => 'http://localhost:5173/cancel',
+    ]);
+
+    return response()->json(['url' => $session->url]);
+});
+
+
+
+// TICKETS
+
+Route::get('/user/{userId}/tickets', [TicketController::class, 'userTickets']);
+Route::post('/tickets', [TicketController::class, 'create']);
+
+// WEBHOOKS
+
+Route::post('/stripe/webhook', [TicketController::class, 'handleWebhook']);
+
+
+
     
 
    

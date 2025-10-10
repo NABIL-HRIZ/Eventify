@@ -7,12 +7,17 @@ import { IoCartOutline } from "react-icons/io5";
 import mar_flag from '../assets/mar.jpg';
 import appStore from '../assets/app-store.webp';
 import playStore from '../assets/play-store.jpg';
+
+import { useSelector } from "react-redux";
 import '../styles/Navbar.css';
 
 function MyNavbar() {
   const { user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  
+  const cartCount = useSelector((state) => state.cart.cartCount);
 
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
@@ -59,7 +64,7 @@ function MyNavbar() {
           </span>
           <Link className="nav-link-modern cart-link" to="/cart" onClick={closeDropdown}>
             <IoCartOutline className="cart-icon"/>
-            <span className="cart-badge">0</span>
+           <span className="cart-badge">{cartCount}</span>
           </Link>
         </div>
 

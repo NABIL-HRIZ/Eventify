@@ -28,6 +28,8 @@ import Faqs from './componants/Faqs'
 import Politiques from './componants/Politiques'
 import Checkout from './componants/Checkout'
 import CheckoutForm from './componants/CheckoutForm.'
+import Success from './componants/Success'
+import Cart from './componants/Cart'
 
 
 
@@ -62,8 +64,9 @@ const App = () => {
           <Route path='politique' element={<Politiques/>} />
          <Route path="/user/event/:id/checkout" element={<Checkout />} />
          <Route path="/create-payement" element={<Checkout />} />
-
-
+<Route path="/success" element={<Success />} />
+<Route path="/cancel" element={<h1>Paiement annulé </h1>} />
+<Route path='/cart' element={<Cart />} />
 
 
       </Routes>

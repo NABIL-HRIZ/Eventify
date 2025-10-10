@@ -1,42 +1,43 @@
-// src/CheckoutForm.js
-import React, { useState, useEffect } from "react";
-import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import axios from "axios";
+import {useCheckout, PaymentElement} from '@stripe/react-stripe-js/checkout';
 
-export default function CheckoutForm({ amount }) {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [clientSecret, setClientSecret] = useState("");
+const CheckoutForm = () => {
+  const checkoutState = useCheckout();
 
-  useEffect(() => {
-    axios.post("http://127.0.0.1:8000/api/create-payment", { amount })
-      .then(res => setClientSecret(res.data.clientSecret))
-      .catch(err => console.log(err));
-  }, [amount]);
+  const handleSubmit = async (event) => {
+    // We don't want to let default form submission happen here,
+    // which would refresh the page.
+    event.preventDefault();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!stripe || !elements) return;
+    if (checkoutState.type === 'loading') {
+      return (
+        <div>Loading...</div>
+      );
+    } else if (checkoutState.type === 'error') {
+      return (
+        <div>Error: {checkoutState.error.message}</div>
+      );
+    }
 
-    const result = await stripe.confirmCardPayment(clientSecret, {
-      payment_method: {
-        card: elements.getElement(CardElement),
-      },
-    });
+    // checkoutState.type === 'success'
+    const {checkout} = checkoutState;
+    const result = await checkout.confirm();
 
-    if (result.error) {
-      alert(result.error.message);
+    if (result.type === 'error') {
+      // Show error to your customer (for example, payment details incomplete)
+      console.log(result.error.message);
     } else {
-      if (result.paymentIntent.status === "succeeded") {
-        alert("Paiement réussi !");
-      }
+      // Your customer will be redirected to your `return_url`. For some payment
+      // methods like iDEAL, your customer will be redirected to an intermediate
+      // site first to authorize the payment, then redirected to the `return_url`.
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <CardElement />
-      <button type="submit" disabled={!stripe}>Payer {amount/100} MAD</button>
+      <PaymentElement />
+      <button>Submit</button>
     </form>
-  );
-}
+  )
+};
+
+export default CheckoutForm;
