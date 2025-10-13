@@ -283,7 +283,9 @@
   }
 
   .action-buttons {
-    flex-direction: column;
+    display: flex !important;
+    justify-content: space-between !important;
+    gap: 15px;
   }
 
   .primary-btn, .secondary-btn {

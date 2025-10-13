@@ -75,7 +75,7 @@
   color: white;
 }
 
-.cart-badge {
+.cart-baddge {
   position: absolute;
   top: -5px;
   right: -5px;
@@ -296,6 +296,7 @@
   border-radius: 8px;
   transition: transform 0.3s ease;
   cursor: pointer;
+  background-color: transparent;
 }
 
 .app-download-img:hover {

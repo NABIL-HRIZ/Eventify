@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AdminSideBar from './AdminSideBar';
 import '../styles/CreateEvent.css';
+import Swal from 'sweetalert2';
 
 const CreateAdminEvent = () => {
   const [formData, setFormData] = useState({
@@ -17,12 +18,23 @@ const CreateAdminEvent = () => {
   const [events, setEvents] = useState([]);
   const [editingEvent, setEditingEvent] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
- 
-
-
+  const Toast = Swal.mixin({
+    background: '#1a1a2e',
+    color: 'white',
+    iconColor: '#FFD700',
+    confirmButtonColor: '#FFD700',
+    cancelButtonColor: '#6c757d',
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.addEventListener('mouseenter', Swal.stopTimer)
+      toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
+  });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -56,8 +68,6 @@ const CreateAdminEvent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    setSuccess('');
 
     try {
       const token = localStorage.getItem('token');
@@ -71,7 +81,6 @@ const CreateAdminEvent = () => {
 
       let response;
       if (editingEvent) {
-        // Update existing event
         response = await axios.put(
           `http://127.0.0.1:8000/api/evenement/${editingEvent.id}`,
           formDataToSend,
@@ -82,9 +91,13 @@ const CreateAdminEvent = () => {
             }
           }
         );
-        setSuccess('Événement mis à jour avec succès!');
+        
+        Toast.fire({
+          icon: 'success',
+          title: 'Événement mis à jour avec succès!',
+          iconColor: '#00ff7f'
+        });
       } else {
-        // Create new event
         response = await axios.post(
           'http://127.0.0.1:8000/api/create-evenement',
           formDataToSend,
@@ -95,16 +108,30 @@ const CreateAdminEvent = () => {
             }
           }
         );
-        setSuccess('Événement créé avec succès!');
+        
+        Toast.fire({
+          icon: 'success',
+          title: 'Événement créé avec succès!',
+          iconColor: '#00ff7f'
+        });
       }
 
       if (response.data.success) {
         resetForm();
-       
       }
     } catch (error) {
       console.error('Error saving event:', error);
-      setError(error.response?.data?.message || 'Erreur lors de la sauvegarde de l\'événement');
+      
+      // Error SweetAlert
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: error.response?.data?.message || 'Erreur lors de la sauvegarde de l\'événement',
+        background: '#1a1a2e',
+        color: 'white',
+        confirmButtonColor: '#FFD700',
+        confirmButtonText: 'OK'
+      });
     } finally {
       setLoading(false);
     }
@@ -115,7 +142,7 @@ const CreateAdminEvent = () => {
     setFormData({
       title: event.title,
       description: event.description || '',
-      date_debut: event.date_debut.split(' ')[0], // Format for datetime-local
+      date_debut: event.date_debut.split(' ')[0], 
       date_fin: event.date_fin.split(' ')[0],
       lieu: event.lieu,
       prix: event.prix,
@@ -126,28 +153,57 @@ const CreateAdminEvent = () => {
   };
 
   const handleDelete = async (eventId) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) {
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.delete(
-        `http://127.0.0.1:8000/api/evenement/${eventId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          }
-        }
-      );
-
-      if (response.data.success) {
-        setSuccess('Événement supprimé avec succès!');
-       
+    const result = await Swal.fire({
+      title: 'Êtes-vous sûr?',
+      text: "Vous ne pourrez pas annuler cette action!",
+      icon: 'warning',
+      background: '#1a1a2e',
+      color: 'white',
+      iconColor: '#ffcc00',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Oui, supprimer!',
+      cancelButtonText: 'Annuler',
+      customClass: {
+        popup: 'custom-swal-popup'
       }
-    } catch (error) {
-      console.error('Error deleting event:', error);
-      setError('Erreur lors de la suppression de l\'événement');
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.delete(
+          `http://127.0.0.1:8000/api/evenement/${eventId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            }
+          }
+        );
+
+        if (response.data.success) {
+          // Success SweetAlert for deletion
+          Toast.fire({
+            icon: 'success',
+            title: 'Événement supprimé avec succès!',
+            iconColor: '#00ff7f'
+          });
+        }
+      } catch (error) {
+        console.error('Error deleting event:', error);
+        
+        // Error SweetAlert for deletion
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur',
+          text: 'Erreur lors de la suppression de l\'événement',
+          background: '#1a1a2e',
+          color: 'white',
+          confirmButtonColor: '#FFD700',
+          confirmButtonText: 'OK'
+        });
+      }
     }
   };
 
@@ -159,7 +215,7 @@ const CreateAdminEvent = () => {
 
   return (
     <>
-  <AdminSideBar />
+      <AdminSideBar />
       <div className="create-event-container">
         <div className="create-event-card">
           {/* Header */}
@@ -172,18 +228,6 @@ const CreateAdminEvent = () => {
               }
             </p>
           </div>
-
-          {/* Messages */}
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
-          {success && (
-            <div className="success-message">
-              {success}
-            </div>
-          )}
 
           {/* Event Form */}
           <form onSubmit={handleSubmit} className="event-form">
@@ -198,7 +242,7 @@ const CreateAdminEvent = () => {
                   onChange={handleInputChange}
                   className="form-input"
                   required
-                  placeholder="Ex: Concert de Jazz en Plein Air"
+                  placeholder="Ex: Stade complexe MOhamed 5 "
                 />
               </div>
 
@@ -229,7 +273,7 @@ const CreateAdminEvent = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="date_fin">Date et heure de dupart de l'événement *</label>
+                <label htmlFor="date_fin">Date et heure de départ de l'événement *</label>
                 <input
                   type="datetime-local"
                   id="date_fin"
@@ -310,12 +354,16 @@ const CreateAdminEvent = () => {
                 className={`submit-btn ${loading ? 'loading' : ''}`}
                 disabled={loading}
               >
-                {loading 
-                  ? 'Enregistrement...' 
-                  : editingEvent 
-                    ? 'Mettre à jour l\'événement' 
-                    : 'Créer l\'événement'
-                }
+                {loading ? (
+                  <>
+                    <span className="spinner"></span>
+                    Enregistrement...
+                  </>
+                ) : editingEvent ? (
+                  'Mettre à jour l\'événement'
+                ) : (
+                  ' Créer l\'événement'
+                )}
               </button>
               {editingEvent && (
                 <button 
@@ -328,8 +376,6 @@ const CreateAdminEvent = () => {
               )}
             </div>
           </form>
-
-       
         </div>
       </div>
     </>

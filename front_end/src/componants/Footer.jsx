@@ -1,7 +1,7 @@
 import React from 'react';
 import '../styles/Footer.css';
-import appStore from '../assets/app-store.webp';
-import playStore from '../assets/play-store.jpg';
+import appStore from '../assets/app-store.png';
+import playStore from '../assets/play-store.png';
 
 const Footer = () => {
   return (
@@ -28,9 +28,9 @@ const Footer = () => {
           <div className="footer-column">
             <h4 className="column-title">Explorer</h4>
             <ul className="footer-links">
-              <li><a href="#" className="footer-link">Billetterie</a></li>
-              <li><a href="#" className="footer-link">Cinéma</a></li>
-              <li><a href="#" className="footer-link">Sport</a></li>
+              <li><a href="billetterie" className="footer-link">Billetterie</a></li>
+              <li><a href="cinema" className="footer-link">Cinéma</a></li>
+              <li><a href="sport" className="footer-link">Sport</a></li>
              
             </ul>
           </div>
@@ -65,7 +65,6 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Footer Bottom */}
         <div className="footer-bottom">
           <div className="footer-bottom-content">
             <div className="copyright">

@@ -6,15 +6,34 @@ use App\Models\Evenement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
-
+use App\Jobs\SendNewEventEmailJob;
+use App\Models\Ticket;
 
 class EvenementController extends Controller
 {
     // Liste des événements
-    public function index()
-    {
-        return response()->json(Evenement::with('organisateur')->get());
+ 
+public function index(Request $request)
+{
+    $query = Evenement::with(['organisateur:id,nom,email']);
+
+    if ($request->filled('categorie')) {
+        $query->whereRaw('LOWER(categorie) = ?', [strtolower($request->categorie)]);
     }
+
+    if ($request->boolean('paginate')) { 
+        $evenements = $query->paginate(10); 
+        return response()->json($evenements);
+    }
+
+    $evenements = $query->get();
+    return response()->json([
+        'success' => true,
+        'evenements' => $evenements
+    ]);
+}
+
+
 
 
 
@@ -43,6 +62,9 @@ public function getOwnEvents()
         'success' => true,
         'evenements' => $evenements
     ]);
+
+
+
 }
 
 
@@ -81,6 +103,10 @@ public function getOwnEvents()
 
         ]);
 
+        Cache::forget('top_evenements');
+
+         SendNewEventEmailJob::dispatch($evenement);
+
         return response()->json([
             'success'   => true,
             'evenement' => $evenement,
@@ -103,7 +129,7 @@ public function getOwnEvents()
 
 
 
-    public function update(Request $request, $id)
+public function update(Request $request, $id)
 {
     $evenement = Evenement::findOrFail($id);
 
@@ -118,19 +144,24 @@ public function getOwnEvents()
         'categorie'   => 'sometimes|in:billetterie,sport,cinema',
     ]);
 
+    // Update image if provided
     if ($request->hasFile('image')) {
         $path = $request->file('image')->store('evenements', 'public');
         $evenement->image = $path;
     }
 
+    // Update other fields if they exist in request
     $fields = ['title', 'description', 'date_debut', 'date_fin', 'lieu', 'prix', 'categorie'];
     foreach ($fields as $field) {
-        if ($request->filled($field)) {
-            $evenement->$field = $request->$field;
+        if ($request->has($field)) { // <-- changed from filled() to has()
+            $evenement->$field = $request->input($field);
         }
     }
 
     $evenement->save();
+
+    // Clear cache if needed
+    Cache::forget('top_evenements');
 
     return response()->json([
         'success' => true,
@@ -138,6 +169,7 @@ public function getOwnEvents()
         'evenement' => $evenement,
     ]);
 }
+
 
 
 
@@ -155,7 +187,7 @@ public function getOwnEvents()
 
   public function getTopEvenement()
 {
-    $evenements = Cache::remember('top_evenements', 60*60, function () {
+    $evenements = Cache::remember('top_evenements', 60, function () {
         return Evenement::orderBy('views', 'desc')
             ->take(10)
             ->get();
@@ -167,39 +199,35 @@ public function getOwnEvents()
     ], 200);
 }
 
+
 public function search(Request $request)
 {
-    $query = Evenement::with(['organisateur:id,prenom,nom,email']) 
-        ->select('id', 'title', 'categorie', 'lieu', 'date_debut', 'date_fin', 'organisateur_id');
+    $query = Evenement::with(['organisateur:id,prenom,nom,email']);
 
-    if ($request->filled('title')) {
-        $query->where('title', 'like', '%' . $request->title . '%');
+    if ($request->filled('title') || $request->filled('lieu')) {
+        $query->where(function($q) use ($request) {
+            if ($request->filled('title')) {
+                $q->where('title', 'like', '%' . $request->title . '%');
+            }
+            if ($request->filled('lieu')) {
+                $q->orWhere('lieu', 'like', '%' . $request->lieu . '%');
+            }
+        });
     }
 
-    if ($request->filled('categorie')) {
-        $query->where('categorie', $request->categorie);
-    }
+    $evenements = $query->orderBy('date_debut', 'asc')->paginate(10);
 
-    if ($request->filled('lieu')) {
-        $query->where('lieu', 'like', '%' . $request->lieu . '%');
-    }
-
-    if ($request->filled('date_debut')) {
-        $query->whereDate('date_debut', '>=', $request->date_debut);
-    }
-
-    if ($request->filled('date_fin')) {
-        $query->whereDate('date_fin', '<=', $request->date_fin);
-    }
-
-    $evenements = $query->orderBy('date_debut', 'asc')
-                        ->paginate(10);
+    $evenements->getCollection()->transform(function($event) {
+        $event->image = $event->image ? asset('storage/' . $event->image) : null;
+        return $event;
+    });
 
     return response()->json([
         'success' => true,
         'evenements' => $evenements
     ]);
 }
+
 
 
 
@@ -216,6 +244,31 @@ public function search(Request $request)
         'categories' => $categories
     ]);
 }
+
+
+public function ticketsSold(Request $request)
+{
+    $organisateurId = $request->user()->id;
+
+    $eventIds = Evenement::where('organisateur_id', $organisateurId)->pluck('id');
+
+    $tickets = Ticket::whereIn('event_id', $eventIds)->get();
+
+    $totalTickets = $tickets->sum('quantity');
+
+    $totalRevenue = $tickets->sum(function ($ticket) {
+        return $ticket->amount * $ticket->quantity;
+    });
+
+    return response()->json([
+        'success' => true,
+        'totalTickets' => $totalTickets,
+        'totalRevenue' => $totalRevenue,
+        'tickets' => $tickets,
+    ]);
+}
+
+
 
 
 }

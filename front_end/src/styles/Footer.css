@@ -122,15 +122,11 @@
 }
 
 .app-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: flex !important;
+  gap: 12px !important;
 }
 
-.app-button {
-  display: block;
-  transition: transform 0.3s ease;
-}
+
 
 
 .app-button img {

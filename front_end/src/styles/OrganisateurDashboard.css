@@ -1,0 +1,202 @@
+.dashboard-acceil {
+  margin-left: 280px;
+  padding: 30px;
+  min-height: 100vh;
+margin-top:-650px;
+
+}
+
+.dashboard-header {
+  padding: 30px;
+  border-radius: 20px;
+  margin-bottom: 30px;
+  backdrop-filter: blur(10px);
+}
+
+.dashboard-header h1 {
+  color: #e0e1e2;
+  margin: 0 0 10px 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.dashboard-header p {
+  color: #bbbcbd;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.stats-section {
+  padding: 30px;
+  border-radius: 20px;
+  margin-bottom: 30px;
+}
+
+.stats-section h2 {
+  color: #e3e3e3;
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.card-stats-infos {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 25px;
+  margin-top: 20px;
+}
+
+.stat-card-infos {
+  padding: 30px 25px;
+  border-radius: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border-top: 5px solid transparent;
+  position: relative;
+  overflow: hidden;
+  background-color:rgba(67, 67, 67, 0.258);
+}
+
+
+.sport-card {
+  border-top-color: #bababa;
+
+}
+
+.cinema-card {
+   border-top-color: #bababa;
+
+}
+
+.billetterie-card {
+  border-top-color: #bababa;
+}
+
+.card-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.stat-card-infos h3 {
+  color: #8d8f91 !important;
+  margin: 0 0 15px 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.stat-number {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin: 20px 0;
+  color: #2d3748;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sport-card .stat-number { color:#e5e5e3; }
+.cinema-card .stat-number { color:#e5e5e3; }
+.billetterie-card .stat-number { color:#e5e5e3; }
+
+.card-footer {
+  color: #d2d3d4 !important;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-top: 10px;
+}
+
+.quick-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.stat-item {
+  padding: 25px;
+  border-radius: 16px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.stat-label {
+  display: block;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  display: block;
+  color: #818b0a;
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+
+.dashboard-acceil > .card-stats-infos {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+  gap: 25px !important;
+  margin-top: 0 !important;
+}
+
+.dashboard-acceil > .card-stats-infos .card {
+  padding: 30px 25px;
+  border-radius: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border-top: 5px solid transparent;
+  position: relative;
+  overflow: hidden;
+  background-color:rgba(67, 67, 67, 0.258);
+
+}
+
+
+
+.dashboard-acceil > .card-stats-infos .card h3 {
+  color: #e4e5e7;
+  margin: 0 0 15px 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  background-color: transparent;
+}
+
+.dashboard-acceil > .card-stats-infos .card p {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin: 20px 0;
+  color: #e6e6e6;
+}
+
+.dashboard-acceil > .card-stats-infos .card:first-child p {
+  color: #f9f9f7;
+  background-color: transparent;
+}
+
+.dashboard-acceil > .card-stats-infos .card:last-child p {
+  color: #f9f9f7;
+  background-color: transparent;
+}
+
+
+@media (max-width: 768px) {
+  .dashboard-acceil {
+    margin-left: 0;
+    padding: 20px;
+  }
+  
+  .card-stats-infos {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-header h1 {
+    font-size: 2rem;
+  }
+  
+  .stat-number {
+    font-size: 2.8rem;
+  }
+}
+
+

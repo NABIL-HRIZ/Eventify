@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Role;
+    use App\Models\Evenement;
+use App\Models\Ticket;
+use Illuminate\Support\Facades\DB;
+
 class AdminController extends Controller
 {
     //  Get all users
@@ -118,4 +122,42 @@ class AdminController extends Controller
 
         return response()->json($user, 200);
     }
+
+
+
+    // get tickets 
+
+
+
+public function getTicketsStats()
+{
+    $stats = DB::table('tickets')
+        ->join('evenements', 'tickets.event_id', '=', 'evenements.id')
+        ->select(
+            'evenements.categorie',
+            DB::raw('SUM(tickets.quantity) as totalTickets'),
+            DB::raw('SUM(tickets.amount * tickets.quantity) as totalRevenue')
+        )
+        ->groupBy('evenements.categorie')
+        ->get();
+
+    $categories = ['sport', 'cinema', 'billetterie'];
+    $data = collect($categories)->map(function ($cat) use ($stats) {
+        $match = $stats->firstWhere('categorie', $cat);
+        return [
+            'categorie' => ucfirst($cat),
+            'tickets' => $match->totalTickets ?? 0,
+            'revenue' => $match->totalRevenue ?? 0,
+        ];
+    });
+
+    return response()->json([
+        'success' => true,
+        'data' => $data
+    ]);
+}
+
+
+
+
 }

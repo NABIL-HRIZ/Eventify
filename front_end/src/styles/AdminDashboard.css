@@ -1,0 +1,147 @@
+.admin-dashboard {
+  margin-left: 280px;
+  padding: 30px;
+  min-height: 100vh;
+
+  margin-top: -650px;
+}
+
+.dashboard-header {
+  padding: 30px;
+  border-radius: 20px;
+  margin-bottom: 30px;
+  backdrop-filter: blur(10px);
+}
+
+.dashboard-header h1 {
+  color: #eeeff1;
+  margin: 0 0 10px 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.dashboard-header p {
+  color: #c6c7c9;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  padding: 35px 30px;
+  border-radius: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border-top: 6px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+
+
+
+/* User Card */
+.user-card{
+  background:#FFCF71 !important;
+}
+
+
+.organisateur-card {
+  background:#FF9D00 !important;
+}
+
+
+
+/* Admin Card */
+.admin-card {
+  background:#B6771D !important;
+}
+
+
+
+.stat-card h3 {
+  color: #030303 !important;
+  margin: 0 0 20px 0;
+  font-size: 1.4rem;
+  font-weight:900;
+  background-color: transparent;
+
+}
+
+.stat-number {
+  font-size: 4rem;
+  font-weight: 800;
+  margin: 25px 0;
+}
+
+.user-card .stat-number { color: #000; }
+.organisateur-card .stat-number { color: #000; }
+.admin-card .stat-number { color: #000; }
+
+.card-footerr {
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top:3px solid #101010 !important;
+  color: rgb(7, 7, 7) !important;
+  background-color: transparent;
+}
+
+
+
+
+
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-dashboard {
+    margin-left: 0;
+    padding: 20px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .dashboard-header h1 {
+    font-size: 2rem;
+  }
+  
+  .stat-number {
+    font-size: 3.2rem;
+  }
+  
+  .stat-value {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-dashboard {
+    padding: 15px;
+  }
+  
+  .dashboard-header {
+    padding: 20px;
+  }
+  
+  .stat-card {
+    padding: 25px 20px;
+  }
+  
+  .stat-number {
+    font-size: 2.8rem;
+  }
+}

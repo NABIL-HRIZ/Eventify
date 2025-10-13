@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import OrganisateurSideBar from './OrganisateurSideBar';
 import '../styles/UserProfile.css';
+import Swal from 'sweetalert2';
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -13,6 +14,23 @@ const UserProfile = () => {
     nom: '',
     phone: '',
     email: ''
+  });
+
+  const Toast = Swal.mixin({
+    background: '#1a1a2e',
+    color: 'white',
+    iconColor: '#FFD700',
+    confirmButtonColor: '#FFD700',
+    cancelButtonColor: '#6c757d',
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.addEventListener('mouseenter', Swal.stopTimer)
+      toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
   });
 
   useEffect(() => {
@@ -41,6 +59,16 @@ const UserProfile = () => {
     } catch (error) {
       console.error('Error fetching user profile:', error);
       setError('Erreur lors du chargement du profil');
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: 'Erreur lors du chargement du profil',
+        background: '#1a1a2e',
+        color: 'white',
+        confirmButtonColor: '#FFD700',
+        confirmButtonText: 'OK'
+      });
     } finally {
       setLoading(false);
     }
@@ -67,11 +95,26 @@ const UserProfile = () => {
       if (response.data.success) {
         setUser(response.data.user);
         setIsEditing(false);
-        alert('Profil mis à jour avec succès!');
+        
+        Toast.fire({
+          icon: 'success',
+          title: 'Profil mis à jour avec succès!',
+          iconColor: '#00ff7f'
+        });
       }
     } catch (error) {
       console.error('Error updating profile:', error);
       setError('Erreur lors de la mise à jour du profil');
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: 'Erreur lors de la mise à jour du profil',
+        background: '#1a1a2e',
+        color: 'white',
+        confirmButtonColor: '#FFD700',
+        confirmButtonText: 'OK'
+      });
     }
   };
 
@@ -132,7 +175,6 @@ const UserProfile = () => {
             </button>
           </div>
 
-          {/* Profile Form */}
           <form onSubmit={handleSubmit} className="profile-form">
             <div className="form-grid">
               <div className="form-group">
@@ -203,8 +245,6 @@ const UserProfile = () => {
                 )}
               </div>
 
-             
-
               <div className="form-group">
                 <label>Date d'inscription</label>
                 <div className="form-display">
@@ -228,8 +268,6 @@ const UserProfile = () => {
               </div>
             )}
           </form>
-
-         
         </div>
       </div>
     </>

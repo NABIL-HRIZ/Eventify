@@ -1,11 +1,12 @@
 .contact-us-section {
   padding:30px 10px !important;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: center !important;
+  align-items: center !important;
   min-height: 400px;
   position: relative;
   overflow: hidden;
+  margin-right:180px;
 }
 
 

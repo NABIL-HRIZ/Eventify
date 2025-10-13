@@ -6,6 +6,7 @@ import '../styles/EventDetail.css';
 import { IoLocationOutline } from "react-icons/io5";
 import { MdDateRange } from "react-icons/md";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const AdminEventsDetail = () => {
   const { id } = useParams(); 
@@ -33,8 +34,56 @@ const AdminEventsDetail = () => {
     navigate(`/admin/edit-event/${id}`);
   };
 
-  const handleBack = () => {
-    navigate(-1);
+  const handleDelete = async () => {
+    // SweetAlert confirmation dialog
+    const result = await Swal.fire({
+      title: 'Êtes-vous sûr?',
+      text: "Cette action est irréversible! L'événement sera définitivement supprimé.",
+      icon: 'warning',
+      background: '#1a1a2e',
+      color: 'white',
+      iconColor: '#ffcc00',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Oui, supprimer!',
+      cancelButtonText: 'Annuler'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const token = localStorage.getItem("token"); 
+        await axios.delete(`http://127.0.0.1:8000/api/evenement/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Success SweetAlert
+        Swal.fire({
+          title: 'Supprimé!',
+          text: 'Événement supprimé avec succès !',
+          icon: 'success',
+          background: '#1a1a2e',
+          color: 'white',
+          confirmButtonColor: '#FFD700'
+        });
+
+        navigate('/admin/events'); 
+      } catch (error) {
+        console.error("Erreur lors de la suppression de l'événement :", error);
+        
+        // Error SweetAlert
+        Swal.fire({
+          title: 'Erreur!',
+          text: 'Erreur lors de la suppression de l\'événement !',
+          icon: 'error',
+          background: '#1a1a2e',
+          color: 'white',
+          confirmButtonColor: '#FFD700'
+        });
+      }
+    }
   };
 
   const formatDate = (dateString) => {
@@ -47,8 +96,6 @@ const AdminEventsDetail = () => {
       minute: '2-digit'
     });
   };
-
- 
 
   if (loading) {
     return (
@@ -70,9 +117,7 @@ const AdminEventsDetail = () => {
           <div className="error-icon"></div>
           <h3>Événement non trouvé</h3>
           <p>L'événement que vous recherchez n'existe pas ou a été supprimé.</p>
-          <button onClick={handleBack} className="back-btn">
-            Retour aux événements
-          </button>
+          
         </div>
       </>
     );
@@ -84,14 +129,26 @@ const AdminEventsDetail = () => {
       <div className="event-detail-container">
         <div className="event-detail-card">
           <div className="event-detail-header">
-             <div className="user-event-detail-header-back">
-           <Link to='/admin/events'>Retourner</Link>
-          </div>
-            <div className="header-actions">
-              <button onClick={handleEdit} className="edit-button">
-                 Modifier l'événement
-              </button>
-            </div>
+            <div className="user-event-detail-header-back">
+                      <Link to='/admin/events' className="back-link">
+                        <span className="back-arrow">←</span>
+                        Retourner aux événements
+                      </Link>
+                    </div>
+          <div className="action-buttons ">
+  <button onClick={handleEdit} className="edit-button">
+    Modifier l'événement
+  </button>
+
+  <button 
+    onClick={handleDelete} 
+    className="delete-button" 
+    style={{ marginLeft: '10px', backgroundColor: 'red', color: 'white' }}
+  >
+    Supprimer l'événement
+  </button>
+</div>
+
           </div>
 
           <div className="event-detail-content">
@@ -104,7 +161,7 @@ const AdminEventsDetail = () => {
               <div className="detail-card">
                   
                   <div className="detail-content">
-                    <p style={{fontSize:"24px",color:"#B6771D",border:"2px solid gray",padding:"10px",borderRadius:"15px"}}>{event.prix} MAD</p>
+                    <p style={{fontSize:"40px",color:"#84994F"}}>{event.prix} MAD</p>
                   </div>
                 </div>
 
@@ -159,10 +216,7 @@ const AdminEventsDetail = () => {
 
               {/* Quick Stats */}
               <div className="quick-stats">
-                <div className="stat">
-                  <span className="stat-number">0</span>
-                  <span className="stat-label">Billets vendus</span>
-                </div>
+               
                 <div className="stat">
                   <span className="stat-number">{event.views}</span>
                   <span className="stat-label">Vues</span>

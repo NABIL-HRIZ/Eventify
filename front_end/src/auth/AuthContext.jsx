@@ -1,4 +1,3 @@
-
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 
@@ -13,7 +12,16 @@ export const AuthProvider = ({ children }) => {
       axios.get("http://127.0.0.1:8000/api/user", {
         headers: { Authorization: `Bearer ${token}` }
       })
-      .then(res => setUser(res.data))
+      .then(res => {
+        const userData = res.data?.user || null;
+        try {
+          const roles = JSON.parse(localStorage.getItem('roles')) || null;
+          if (roles && roles.length > 0) {
+            userData.role = userData.role || roles[0];
+          }
+        } catch (e) {}
+        setUser(userData);
+      })
       .catch(() => setUser(null));
     }
   }, []);
@@ -24,4 +32,3 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-

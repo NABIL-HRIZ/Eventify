@@ -5,8 +5,8 @@ import { AuthContext } from "../auth/AuthContext";
 import { FaBars } from "react-icons/fa";
 import { IoCartOutline } from "react-icons/io5";
 import mar_flag from '../assets/mar.jpg';
-import appStore from '../assets/app-store.webp';
-import playStore from '../assets/play-store.jpg';
+import appStore from '../assets/app-store.png';
+import playStore from '../assets/play-store.png';
 
 import { useSelector } from "react-redux";
 import '../styles/Navbar.css';
@@ -16,8 +16,8 @@ function MyNavbar() {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  
-  const cartCount = useSelector((state) => state.cart.cartCount);
+
+    const { cartCount } = useSelector((state) => state.cart);
 
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
@@ -62,10 +62,13 @@ function MyNavbar() {
           <span className="nav-link-modern flag-link">
             <img src={mar_flag} alt="Maroc flag" className="flag-img"/>
           </span>
-          <Link className="nav-link-modern cart-link" to="/cart" onClick={closeDropdown}>
-            <IoCartOutline className="cart-icon"/>
-           <span className="cart-badge">{cartCount}</span>
-          </Link>
+        <Link className="nav-link-modern cart-link" to="/cart" onClick={closeDropdown}>
+  <IoCartOutline className="cart-icon"/>
+  
+  
+</Link>
+
+
         </div>
 
         <div className="nav-right">
@@ -137,21 +140,15 @@ function MyNavbar() {
                     {user.role === "user" && (
                       <>
                         <Link to="/user/profile" className="dropdown-item-modern" onClick={closeDropdown}>
-                          <div className="menu-item-icon">👤</div>
+                          <div className="menu-item-icon"></div>
                           Mon profil
                         </Link>
-                        <Link to="/user/tickets" className="dropdown-item-modern" onClick={closeDropdown}>
+                        <Link to="/user/achats" className="dropdown-item-modern" onClick={closeDropdown}>
                           <div className="menu-item-icon"></div>
                           Mes tickets
                         </Link>
-                        <Link to="/user/favorites" className="dropdown-item-modern" onClick={closeDropdown}>
-                          <div className="menu-item-icon"></div>
-                          Mes favoris
-                        </Link>
-                        <Link to="/user/reservations" className="dropdown-item-modern" onClick={closeDropdown}>
-                          <div className="menu-item-icon"></div>
-                          Mes réservations
-                        </Link>
+                        
+                        
                       </>
                     )}
 
@@ -202,7 +199,6 @@ function MyNavbar() {
           </div>
         </div>
 
-        {/* Mobile menu button */}
         <button className="mobile-menu-btn" onClick={toggleDropdown}>
           <span></span>
           <span></span>
@@ -210,7 +206,6 @@ function MyNavbar() {
         </button>
       </div>
 
-      {/* Mobile menu overlay */}
       {isDropdownOpen && <div className="dropdown-overlay" onClick={closeDropdown}></div>}
     </nav>
   );

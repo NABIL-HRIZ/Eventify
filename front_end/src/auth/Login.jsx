@@ -130,14 +130,12 @@ const Login = () => {
           </div>
 
           <div className="form-options">
-            <label className="remember-me">
-              <input type="checkbox" /> <span>Se souvenir de moi</span>
-            </label>
+            
             <a href="/forgot-password" className="forgot-password">Mot de passe oublié ?</a>
           </div>
 
-          <button type="submit" className={`submit-btn ${isLoading ? "loading" : ""}`} disabled={isLoading}>
-            {isLoading ? "Connexion..." : "Se connecter"}
+          <button type="submit" className={`submit-btn`}>
+            Se connecter 
           </button>
         </form>
 

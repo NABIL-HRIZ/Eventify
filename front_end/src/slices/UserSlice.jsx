@@ -1,9 +1,8 @@
-// src/redux/slices/UserSlice.jsx
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   user: null,
-  purchasedEvents: [], // this stores tickets
+  purchasedEvents: [], 
 };
 
 const userSlice = createSlice({
@@ -17,7 +16,7 @@ const userSlice = createSlice({
       state.purchasedEvents.push(action.payload);
     },
     setPurchasedEvents: (state, action) => {
-      state.purchasedEvents = action.payload; // <-- we need this
+      state.purchasedEvents = action.payload; 
     },
   },
 });

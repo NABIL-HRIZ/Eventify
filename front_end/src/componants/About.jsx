@@ -1,7 +1,7 @@
 import React from 'react'
-import img from '../assets/info.png'
-import img_1 from '../assets/app-store.webp'
-import img_2 from '../assets/play-store.jpg'
+import img from '../assets/app-mobile.png'
+import img_1 from '../assets/app-store.png'
+import img_2 from '../assets/play-store.png'
 import '../styles/About.css'
 const About = () => {
   return (

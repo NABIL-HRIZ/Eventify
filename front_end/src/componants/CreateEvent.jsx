@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import OrganisateurSideBar from './OrganisateurSideBar';
 import '../styles/CreateEvent.css';
+import Swal from 'sweetalert2';
 
 const CreateEvent = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +21,23 @@ const CreateEvent = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+
+   const Toast = Swal.mixin({
+      background: '#1a1a2e',
+      color: 'white',
+      iconColor: '#FFD700',
+      confirmButtonColor: '#FFD700',
+      cancelButtonColor: '#6c757d',
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer)
+        toast.addEventListener('mouseleave', Swal.resumeTimer)
+      }
+    });
  
 
 
@@ -71,7 +89,7 @@ const CreateEvent = () => {
 
       let response;
       if (editingEvent) {
-        // Update existing event
+        
         response = await axios.put(
           `http://127.0.0.1:8000/api/evenement/${editingEvent.id}`,
           formDataToSend,
@@ -82,9 +100,14 @@ const CreateEvent = () => {
             }
           }
         );
-        setSuccess('Événement mis à jour avec succès!');
+        
+        Toast.fire({
+          icon: 'success',
+          title: 'Événement mis à jour avec succès!',
+          iconColor: '#00ff7f'
+        });
+
       } else {
-        // Create new event
         response = await axios.post(
           'http://127.0.0.1:8000/api/create-evenement',
           formDataToSend,
@@ -95,7 +118,12 @@ const CreateEvent = () => {
             }
           }
         );
-        setSuccess('Événement créé avec succès!');
+       
+         Toast.fire({
+          icon: 'success',
+          title: 'Événement créé avec succès!',
+          iconColor: '#00ff7f'
+        });
       }
 
       if (response.data.success) {

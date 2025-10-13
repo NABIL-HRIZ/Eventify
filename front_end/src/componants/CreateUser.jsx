@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import AdminSideBar from './AdminSideBar';
-import '../styles/CreateUser.css'
+import '../styles/CreateUser.css';
+import Swal from 'sweetalert2';
+
 const CreateUser = () => {
   const [formData, setFormData] = useState({
     prenom: '',
@@ -10,7 +12,23 @@ const CreateUser = () => {
     password: ''
   });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+
+  const Toast = Swal.mixin({
+    background: '#1a1a2e',
+    color: 'white',
+    iconColor: '#FFD700',
+    confirmButtonColor: '#FFD700',
+    cancelButtonColor: '#6c757d',
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.addEventListener('mouseenter', Swal.stopTimer)
+      toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
+  });
 
   const handleChange = (e) => {
     setFormData({
@@ -19,42 +37,65 @@ const CreateUser = () => {
     });
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setMessage("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    const response = await fetch("http://127.0.0.1:8000/api/add-user", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${localStorage.getItem("token")}`
-      },
-      body: JSON.stringify(formData)
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      setMessage("User created successfully!");
-      setFormData({
-        prenom: "",
-        nom: "",
-        phone: "",
-        email: "",
-        password: ""
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/add-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify(formData)
       });
-    } else {
-      setMessage("Error creating user: " + (data.message || "Unknown error"));
-    }
-  } catch (error) {
-    setMessage("Network error: " + error.message);
-  } finally {
-    setLoading(false);
-  }
-};
 
+      const data = await response.json();
+
+      if (data.success) {
+        // Success SweetAlert
+        Toast.fire({
+          icon: 'success',
+          title: 'Utilisateur créé avec succès!',
+          iconColor: '#00ff7f'
+        });
+
+        // Reset form
+        setFormData({
+          prenom: "",
+          nom: "",
+          phone: "",
+          email: "",
+          password: ""
+        });
+      } else {
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur',
+          text: data.message || "Erreur lors de la création de l'utilisateur",
+          background: '#1a1a2e',
+          color: 'white',
+          confirmButtonColor: '#FFD700',
+          confirmButtonText: 'OK'
+        });
+      }
+    } catch (error) {
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur réseau',
+        text: "Impossible de se connecter au serveur",
+        background: '#1a1a2e',
+        color: 'white',
+        confirmButtonColor: '#FFD700',
+        confirmButtonText: 'OK'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="admin-container">
@@ -62,14 +103,14 @@ const CreateUser = () => {
       <div className="create-user-container">
         <div className="create-user-card">
           <div className="create-user-header">
-            <h1>Create New User</h1>
-            <p>Add a new user to the system</p>
+            <h1>Créer un Nouvel Utilisateur</h1>
+            <p>Ajouter un nouvel utilisateur au système</p>
           </div>
 
           <form onSubmit={handleSubmit} className="create-user-form">
             <div className="form-grid">
               <div className="form-group">
-                <label htmlFor="prenom">First Name *</label>
+                <label htmlFor="prenom">Prénom *</label>
                 <input
                   type="text"
                   id="prenom"
@@ -77,12 +118,12 @@ const CreateUser = () => {
                   value={formData.prenom}
                   onChange={handleChange}
                   required
-                  placeholder="Enter first name"
+                  placeholder="Entrez le prénom"
                 />
               </div>
 
               <div className="form-group">
-                <label htmlFor="nom">Last Name *</label>
+                <label htmlFor="nom">Nom *</label>
                 <input
                   type="text"
                   id="nom"
@@ -90,12 +131,12 @@ const CreateUser = () => {
                   value={formData.nom}
                   onChange={handleChange}
                   required
-                  placeholder="Enter last name"
+                  placeholder="Entrez le nom"
                 />
               </div>
 
               <div className="form-group">
-                <label htmlFor="phone">Phone *</label>
+                <label htmlFor="phone">Téléphone *</label>
                 <input
                   type="tel"
                   id="phone"
@@ -103,7 +144,7 @@ const CreateUser = () => {
                   value={formData.phone}
                   onChange={handleChange}
                   required
-                  placeholder="Enter phone number"
+                  placeholder="Entrez le numéro de téléphone"
                 />
               </div>
 
@@ -116,12 +157,12 @@ const CreateUser = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  placeholder="Enter email address"
+                  placeholder="Entrez l'adresse email"
                 />
               </div>
 
               <div className="form-group full-width">
-                <label htmlFor="password">Password *</label>
+                <label htmlFor="password">Mot de passe *</label>
                 <input
                   type="password"
                   id="password"
@@ -129,7 +170,7 @@ const CreateUser = () => {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  placeholder="Enter password (min. 6 characters)"
+                  placeholder="Entrez le mot de passe (min. 6 caractères)"
                   minLength="6"
                 />
               </div>
@@ -140,14 +181,15 @@ const CreateUser = () => {
               className={`submit-btn ${loading ? 'loading' : ''}`}
               disabled={loading}
             >
-              {loading ? 'Creating User...' : 'Create User'}
+              {loading ? (
+                <>
+                  <span className="spinner"></span>
+                  Création en cours...
+                </>
+              ) : (
+                'Créer Utilisateur'
+              )}
             </button>
-
-            {message && (
-              <div className={`message ${message.includes('successfully') ? 'success' : 'error'}`}>
-                {message}
-              </div>
-            )}
           </form>
         </div>
       </div>

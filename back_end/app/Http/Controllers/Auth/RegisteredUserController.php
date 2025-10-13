@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use App\Models\Role;
-
+use App\Jobs\SendWelcomeMailJob;
 
 
 
@@ -47,10 +47,12 @@ if($userRole) {
 }
           
 
+         $token = $user->createToken('api-token')->plainTextToken;
 
         // event(new Registered($user));
 
-         $token = $user->createToken('api-token')->plainTextToken;
+        SendWelcomeMailJob::dispatch($user);
+
 
         return response()->json([
             'success'=>true,

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AdminSideBar from './AdminSideBar';
 import '../styles/UserProfile.css';
+import Swal from 'sweetalert2';
 
 const AdminProfile = () => {
   const [user, setUser] = useState(null);
@@ -13,6 +14,24 @@ const AdminProfile = () => {
     nom: '',
     phone: '',
     email: ''
+  });
+
+  // Configure SweetAlert2 theme for dark background
+  const Toast = Swal.mixin({
+    background: '#1a1a2e',
+    color: 'white',
+    iconColor: '#FFD700',
+    confirmButtonColor: '#FFD700',
+    cancelButtonColor: '#6c757d',
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.addEventListener('mouseenter', Swal.stopTimer)
+      toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
   });
 
   useEffect(() => {
@@ -41,6 +60,17 @@ const AdminProfile = () => {
     } catch (error) {
       console.error('Error fetching user profile:', error);
       setError('Erreur lors du chargement du profil');
+      
+      // SweetAlert for error
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: 'Erreur lors du chargement du profil',
+        background: '#1a1a2e',
+        color: 'white',
+        confirmButtonColor: '#FFD700',
+        confirmButtonText: 'OK'
+      });
     } finally {
       setLoading(false);
     }
@@ -67,11 +97,28 @@ const AdminProfile = () => {
       if (response.data.success) {
         setUser(response.data.user);
         setIsEditing(false);
-        alert('Profil mis à jour avec succès!');
+        
+        // SweetAlert for success
+        Toast.fire({
+          icon: 'success',
+          title: 'Profil mis à jour avec succès!',
+          iconColor: '#00ff7f'
+        });
       }
     } catch (error) {
       console.error('Error updating profile:', error);
       setError('Erreur lors de la mise à jour du profil');
+      
+      // SweetAlert for error
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: 'Erreur lors de la mise à jour du profil',
+        background: '#1a1a2e',
+        color: 'white',
+        confirmButtonColor: '#FFD700',
+        confirmButtonText: 'OK'
+      });
     }
   };
 

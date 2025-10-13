@@ -10,7 +10,7 @@ import { loadStripe } from "@stripe/stripe-js";
 
 
 import { useDispatch, useSelector } from "react-redux";
-import { incrementCart } from "../slices/CartSlice";
+import {  incrementCartBy } from "../slices/CartSlice";
 import { addPurchasedEvent } from "../slices/UserSlice";
 
 
@@ -52,19 +52,19 @@ const purchasedEvents = useSelector((state) => state.user.purchasedEvents);
 
 const handleCheckout = async () => {
   try {
-const res = await axios.post("http://127.0.0.1:8000/api/create-checkout-session", {
-  amount: event.prix,
-  count,
-  title: event.title,
-  eventId: event.id,
-  userId: user?.id,
-  metadata: { userId: user?.id, eventId: event.id, count, amount: event.prix },
-  return_url: `http://localhost:3000/success`
-});
+    const res = await axios.post("http://127.0.0.1:8000/api/create-checkout-session", {
+      amount: event.prix,
+      count,
+      title: event.title,
+      eventId: event.id,
+      user_id: user?.id, 
+      
+      return_url: `http://localhost:3000/success?eventId=${event.id}&title=${encodeURIComponent(event.title)}&count=${count}&amount=${event.prix}`
+    });
 
+    dispatch(incrementCartBy(count));
 
-
-
+    
     window.location.href = res.data.url;
   } catch (err) {
     console.error("Erreur Stripe:", err);
@@ -117,7 +117,7 @@ const res = await axios.post("http://127.0.0.1:8000/api/create-checkout-session"
               <h3 className="event-title">{event.title}</h3>
 
               <div className="detail-item">
-                <FaCalendarAlt className="detail-icon" />
+                <FaCalendarAlt className="detaill-icon" />
                 <div className="detail-content">
                   <span className="detail-label">Date de l'événement</span>
                   <span className="detail-value">
@@ -134,7 +134,7 @@ const res = await axios.post("http://127.0.0.1:8000/api/create-checkout-session"
               </div>
 
               <div className="detail-item">
-                <FaMapMarkerAlt className="detail-icon" />
+                <FaMapMarkerAlt className="detaill-icon" />
                 <div className="detail-content">
                   <span className="detail-label">Lieu</span>
                   <span className="detail-value">{event.lieu}</span>
@@ -227,7 +227,7 @@ const res = await axios.post("http://127.0.0.1:8000/api/create-checkout-session"
               className={`checkout-button ${!acceptTerms ? "disabled" : ""}`}
               disabled={!acceptTerms}
             >
-              Payer avec Stripe
+              Payer Maintenant
             </button>
           </div>
         </div>

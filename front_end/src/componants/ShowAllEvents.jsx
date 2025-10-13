@@ -4,23 +4,37 @@ import '../styles/ShowAllEvents.css';
 import { MdDateRange } from "react-icons/md";
 import { IoLocationOutline } from "react-icons/io5";
 import { Link } from 'react-router-dom';
+
 const ShowAllEvents = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+
+  // Fetch events with optional page
+  const fetchEvents = async (page = 1) => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`http://127.0.0.1:8000/api/evenements?paginate=1&page=${page}`);
+      
+      // Gestion compatibilité : pagination ou ancien tableau
+      const eventsData = res.data.data || res.data.evenements || [];
+      setEvents(eventsData);
+
+      setCurrentPage(res.data.current_page || 1);
+      setLastPage(res.data.last_page || 1);
+
+    } catch (err) {
+      console.error('Erreur fetching events:', err);
+      setEvents([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/evenements')
-      .then(res => {
-        setEvents(res.data.evenements || res.data); 
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+    fetchEvents();
   }, []);
-
-  ;
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('fr-FR', {
@@ -32,7 +46,11 @@ const ShowAllEvents = () => {
     });
   };
 
-
+  const goToPage = (page) => {
+    if (page >= 1 && page <= lastPage) {
+      fetchEvents(page);
+    }
+  };
 
   if (loading) {
     return (
@@ -46,20 +64,19 @@ const ShowAllEvents = () => {
   return (
     <div className="all-events-container">
       <div className="all-events-header">
-        <div className="header-content">
+        <div className="headerr-content">
           <h1>Tous les Événements</h1>
           <p>Découvrez tous les événements disponibles</p>
         </div>
       </div>
 
-
-        <div className="all-events-grid">
-          {events.map(event => (
-            <Link to={`/user/event/${event.id}`} style={{textDecoration:"none"}}>
-                        <div key={event.id} className="event-card">
+      <div className="all-eventss-grid">
+        {events.map(event => (
+          <Link to={`/user/event/${event.id}`} style={{textDecoration:"none"}} key={event.id}>
+            <div className="event-card">
               <div className="event-image">
                 <img
-                  src={`http://localhost:8000/storage/${event.image}`}
+                  src={`http://127.0.0.1:8000/storage/${event.image}`}
                   alt={event.title}
                   onError={(e) => {
                     e.target.src = 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80';
@@ -68,40 +85,40 @@ const ShowAllEvents = () => {
               </div>
 
               <div className="event-content">
-               
-               
-
                 <div className="event-details">
-                  
-         <h3 className="event-title" style={{marginBottom:"10px"}}>{event.title} </h3>
+                  <h3 className="event-tittle">{event.title}</h3>
+
                   <div className="detail-item">
-                    <span className="detail-icon" style={{color:'white',fontSize:"20px",marginTop:"-10px"}}><MdDateRange /></span>
+                    <span className="detail-icon" style={{color:'white',fontSize:"20px",marginTop:"-15px"}}><MdDateRange /></span>
                     <div className="detail-info">
-                      <span className="detail-value">{formatDate(event.date_fin)}</span>
+                      <span className="detaill-value">{formatDate(event.date_fin)}</span>
                     </div>
                   </div>
 
                   <div className="detail-item">
-                    <span className="detail-icon" style={{color:'white',fontSize:"20px",marginTop:"-10px"}}><IoLocationOutline /></span>
+                    <span className="detail-icon" style={{color:'white',fontSize:"20px",marginTop:"-15px"}}><IoLocationOutline /></span>
                     <div className="detail-info">
-                      <span className="detail-value">{event.lieu}</span>
+                      <span className="detaill-value">{event.lieu}</span>
                     </div>
                   </div>
 
-                   <div className="detail-item">
+                  <div className="detail-item">
                     <div className="detail-info">
-                      <span className="detail-value" style={{color:'#fff',fontSize:"15px",fontWeight:"bold",marginLeft:"25px"}}>{event.prix} MAD</span>
+                      <span className="detailll-value" style={{color:'#fff',fontSize:"20px",fontWeight:"bold",marginLeft:"30px"}}>{event.prix} MAD</span>
                     </div>
                   </div>
                 </div>
-
               </div>
             </div>
-            </Link>
+          </Link>
+        ))}
+      </div>
 
-          ))}
-        </div>
-      
+      <div className="pagination">
+        <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>Précédent</button>
+        <span>{currentPage} / {lastPage}</span>
+        <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === lastPage}>Suivant</button>
+      </div>
     </div>
   );
 };

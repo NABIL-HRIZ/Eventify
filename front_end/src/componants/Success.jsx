@@ -1,32 +1,35 @@
-// src/pages/Success.jsx
 import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { incrementCart } from "../slices/CartSlice";
-import { addPurchasedEvent } from "../slices/UserSlice";
-import { useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux"; 
+import { resetCart } from "../slices/CartSlice";
+import { FaCheckCircle } from "react-icons/fa";
+import "../styles/Success.css";
 
 const Success = () => {
   const dispatch = useDispatch();
-  const location = useLocation();
-  const user = useSelector((state) => state.user.user);
+  const user = useSelector((state) => state.user.user); 
 
-useEffect(() => {
-  if (user) {
-    axios.get(`http://127.0.0.1:8000/api/user/${user.id}/tickets`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    }).then(res => dispatch(setPurchasedEvents(res.data)))
-      .catch(err => console.error(err));
-  }
-}, [user]);
+  useEffect(() => {
+
+
+    dispatch(resetCart());
+    
+   
+  }, [dispatch, user]);
 
   return (
-    <div>
-      <h2>Paiement réussi ! </h2>
-      {user ? (
-        <p>Votre billet a été ajouté à vos événements.</p>
-      ) : (
-        <p>Connectez-vous pour voir vos événements payés.</p>
-      )}
+    <div className="minimal-success">
+      <div className="minimal-card">
+        <FaCheckCircle className="minimal-checkmark" />
+        <h1>Paiement Confirmé !</h1>
+        <p>Vos billets ont été ajoutés à votre compte</p>
+
+        <button 
+          className="minimal-btn"
+          onClick={() => (window.location.href = "/cart")}
+        >
+          Voir mes billets
+        </button>
+      </div>
     </div>
   );
 };
