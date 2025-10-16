@@ -5,7 +5,6 @@
 }
 
 
-
 .carousel-header {
   text-align: center;
   margin-bottom: 3rem;
@@ -128,20 +127,7 @@
   animation: slideIn 0.5s ease forwards;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .carousel-container {
-    padding: 3rem 1.5rem;
-  }
-  
-  .carousel-header h2 {
-    font-size: 2.2rem;
-  }
-  
-  .event-card {
-    height: 480px;
-  }
-}
+
 
 @media (max-width: 768px) {
   .carousel-container {
@@ -150,6 +136,7 @@
   
   .carousel-header h2 {
     font-size: 2rem;
+    margin-top: 30px;
   }
   
   .carousel-header p {
@@ -157,7 +144,7 @@
   }
   
   .event-card {
-    height: 450px;
+    height:300px;
   }
   
   .event-content {
@@ -167,6 +154,12 @@
   .carousel-controls {
     gap: 1rem;
   }
+  .carousel-container .swiper{
+    margin-left:10px;
+  }
+.event-overlay {
+  padding: 1rem 4rem;
+}
 }
 
 @media (max-width: 480px) {

@@ -11,13 +11,11 @@ const ShowAllEvents = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
 
-  // Fetch events with optional page
   const fetchEvents = async (page = 1) => {
     setLoading(true);
     try {
       const res = await axios.get(`http://127.0.0.1:8000/api/evenements?paginate=1&page=${page}`);
       
-      // Gestion compatibilité : pagination ou ancien tableau
       const eventsData = res.data.data || res.data.evenements || [];
       setEvents(eventsData);
 

@@ -182,7 +182,7 @@
   margin-left: 0.5rem;
 }
 
-/* Responsive pagination */
+
 @media (max-width: 768px) {
   .pagination {
     gap: 0.8rem;
@@ -262,4 +262,21 @@
     max-width: 400px;
     margin: 0 auto;
   }
+.headerr-content h1{
+ font-size: 30px;
+}
+.headerr-content p{
+  font-size:18px;
+}
+.event-details {
+padding-left:-20px;
+}
+
+
+.detaill-value {
+  
+  margin-left:-10px !important;
+ 
+}
+
 }

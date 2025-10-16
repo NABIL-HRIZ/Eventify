@@ -235,7 +235,7 @@
   }
   
   .events-header-info h1 {
-    font-size: 2rem;
+    font-size: 1rem !important;
   }
   
   .events-grid {
