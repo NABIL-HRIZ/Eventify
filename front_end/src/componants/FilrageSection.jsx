@@ -52,6 +52,7 @@ const FilrageSection = () => {
       </div>
 
       <div className="filtrage-input">
+        
         <input
           type="text"
           placeholder="Cherchez ce que vous voulez"
@@ -59,13 +60,7 @@ const FilrageSection = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyPress={handleKeyPress}
         />
-        <button
-          className="search-icon-btn"
-          onClick={handleSearch}
-          disabled={!searchTerm.trim()}
-        >
-          <FaSearch style={{ color: "white" }} />
-        </button>
+      
       </div>
     </div>
   );
