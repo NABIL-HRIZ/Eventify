@@ -1,22 +1,7 @@
 {
   "build": {
-    "builder": "nixpacks",
-    "root": "back_end",
-    "nixpacksConfig": {
-      "providers": ["php"], 
-      "phases": {
-        "setup": {
-          "nixPkgs": ["php82", "curl"]
-        },
-        "install": {
-          "commands": [
-            "curl -sS https://getcomposer.org/installer | php",
-            "alias composer='php composer.phar'",
-            "composer install --no-dev --optimize-autoloader"
-          ]
-        }
-      }
-    }
+    "builder": "RAILPACK",
+    "root": "back_end"
   },
   "deploy": {
     "startCommand": "php artisan serve --host=0.0.0.0 --port=$PORT"
