@@ -1,8 +1,8 @@
 {
   "build": {
-    "builder": "railpack",
+    "builder": "nixpacks", 
     "root": "back_end",
-    "nixpacksConfig": {
+    "nixpacksConfig": { 
       "phases": {
         "setup": {
           "nixPkgs": ["php82", "curl"]
