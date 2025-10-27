@@ -1,45 +1,10 @@
 {
+  "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "nixpacks",
-    "root": "back_end",
-    "nixpacksConfig": {
-      "phases": {
-        "setup": {
-          "nixPkgs": [
-            "php82", 
-            "php82Extensions.curl",
-            "php82Extensions.mbstring",
-            "php82Extensions.xml",
-            "php82Extensions.openssl",
-            "php82Extensions.tokenizer",
-            "php82Extensions.json",
-            "php82Extensions.pdo",
-            "php82Extensions.pdo_mysql",
-            "curl",
-            "nodejs"
-          ]
-        },
-        "install": {
-          "commands": [
-            "curl -sS https://getcomposer.org/installer | php",
-            "mv composer.phar /usr/local/bin/composer",
-            "chmod +x /usr/local/bin/composer",
-            "composer install --no-dev --optimize-autoloader",
-            "php artisan key:generate",
-            "php artisan storage:link"
-          ]
-        },
-        "build": {
-          "commands": [
-            "php artisan config:cache",
-            "php artisan route:cache",
-            "php artisan view:cache"
-          ]
-        }
-      }
-    }
+    "buildCommand": "cd back_end && composer install --no-dev --optimize-autoloader && php artisan key:generate && php artisan storage:link && php artisan config:cache && php artisan route:cache && php artisan view:cache"
   },
   "deploy": {
-    "startCommand": "php artisan serve --host=0.0.0.0 --port=$PORT"
+    "startCommand": "cd back_end && php artisan serve --host=0.0.0.0 --port=$PORT"
   }
 }
