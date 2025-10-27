@@ -1,0 +1,12 @@
+node_modules
+frontend/node_modules
+front_end/node_modules
+back_end/vendor
+vendor
+.git
+.env
+.env.*
+storage/logs
+coverage
+dist
+build

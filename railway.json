@@ -1,22 +1,9 @@
 {
   "build": {
-    "builder": "nixpacks",
-    "root": "back_end",
-    "nixpacksConfig": {
-      "phases": {
-        "setup": {
-          "nixPkgs": ["php82", "curl"]
-        },
-        "install": {
-          "commands": [
-            "curl -sS https://getcomposer.org/installer | php",
-            "php composer.phar install --no-dev --optimize-autoloader"
-          ]
-        }
-      }
-    }
+    "builder": "docker",
+    "dockerfilePath": "Dockerfile"
   },
   "deploy": {
-    "startCommand": "php artisan serve --host=0.0.0.0 --port=$PORT"
+    "startCommand": "apache2-foreground"
   }
 }
