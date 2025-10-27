@@ -1,8 +1,7 @@
-
 {
   "build": {
     "builder": "nixpacks",
-    "root": "backend",
+    "root": "back_end",
     "nixpacksConfig": {
       "phases": {
         "setup": {
