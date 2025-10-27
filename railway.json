@@ -2,6 +2,13 @@
   "build": {
     "builder": "nixpacks",
     "root": "backend",
+    "nixpacksConfig": {
+      "phases": {
+        "setup": {
+          "nixPkgs": ["php83", "composer"]
+        }
+      }
+    },
     "buildCommand": "composer install --no-dev --optimize-autoloader"
   },
   "deploy": {
